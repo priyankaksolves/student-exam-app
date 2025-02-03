@@ -1,0 +1,66 @@
+/* EditQuestions.css */
+
+.edit-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .edit-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .error-text {
+    color: red;
+    font-size: 14px;
+  }
+  
+  .loading-text {
+    font-size: 16px;
+    color: #666;
+  }
+  
+  .questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .question-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+  }
+  
+  .question-input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .update-button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .update-button:hover {
+    background-color: #0056b3;
+  }
+  
