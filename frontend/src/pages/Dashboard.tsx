@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [newExam, setNewExam] = useState<Partial<Exam>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchExams();
@@ -37,7 +37,6 @@ const Dashboard: React.FC = () => {
 
   const handleCreateExam = async () => {
     try {
-      newExam.created_by = 999; // Remove this after testing
       await createExam(newExam);
       setNewExam({});
       fetchExams();
@@ -67,7 +66,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleStartExam = (examId: number) => {
-    navigate(`/exam/${examId}/questions`); // Redirect to questions page
+    navigate(`/exam/${examId}/questions`);
   };
 
   if (loading) return <p className="loading-text">Loading exams...</p>;
@@ -78,7 +77,6 @@ const Dashboard: React.FC = () => {
       <h1 className="dashboard-title">Dashboard</h1>
       <h2 className="section-title">Upcoming Exams</h2>
 
-      {/* Add New Exam */}
       <div className="exam-form">
         <h3>{editingExam ? "Edit Exam" : "Create Exam"}</h3>
         <input
@@ -129,7 +127,6 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Display Exams */}
       {exams.length > 0 ? (
         <div className="exam-list">
           {exams.map((exam) => (
@@ -140,9 +137,7 @@ const Dashboard: React.FC = () => {
               <p className={`exam-status ${exam.is_live ? "live" : "not-live"}`}>
                 Status: {exam.is_live ? "Live" : "Not Live"}
               </p>
-              <button onClick={() => handleStartExam(exam.id)} className="start-button">
-                Start Exam
-              </button>
+              <button onClick={() => handleStartExam(exam.id)} className="start-button">Start Exam</button>
               <button onClick={() => setEditingExam(exam)} className="edit-button">Edit</button>
               <button onClick={() => handleDeleteExam(exam.id)} className="delete-button">Delete</button>
             </div>

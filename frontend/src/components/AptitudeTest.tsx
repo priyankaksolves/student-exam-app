@@ -19,6 +19,7 @@ const AptitudeTest = () => {
   const userId = 1; // Replace with actual user ID from authentication
 
   useEffect(() => {
+    debugger;
     fetchQuestions();
   }, [examId]);
 

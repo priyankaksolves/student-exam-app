@@ -1,158 +1,126 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getExams, createExam, updateExam, deleteExam } from "../api"; // Import exam APIs
-import "../styles/Dashboard.css";
+import React, { useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../authContext/AuthContext';
 
-interface Exam {
-  id: number;
-  title: string;
-  start_time: string;
-  end_time: string;
-  is_live: boolean;
-  created_by: number;
-}
-
-const Dashboard: React.FC = () => {
-  const [exams, setExams] = useState<Exam[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [newExam, setNewExam] = useState<Partial<Exam>>({});
-  const [editingExam, setEditingExam] = useState<Exam | null>(null);
-  const navigate = useNavigate(); // Hook for navigation
+const Header: React.FC = () => {
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchExams();
-  }, []);
-
-  const fetchExams = async () => {
-    try {
-      const response = await getExams();
-      setExams(response.data);
-    } catch (err) {
-      setError("Failed to fetch exams. Please try again.");
-    } finally {
-      setLoading(false);
+    if (isLoggedIn && window.location.pathname === "/login") {
+      debugger;
+      navigate('/dashboard');
     }
-  };
+  }, [isLoggedIn, navigate]);
 
-  const handleCreateExam = async () => {
-    try {
-      newExam.created_by = 999; // Remove this after testing
-      await createExam(newExam);
-      setNewExam({});
-      fetchExams();
-    } catch (err) {
-      setError("Failed to create exam. Please try again.");
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/login'); // Redirect after logout
   };
-
-  const handleEditExam = async () => {
-    if (!editingExam) return;
-    try {
-      await updateExam(editingExam.id, editingExam);
-      setEditingExam(null);
-      fetchExams();
-    } catch (err) {
-      setError("Failed to update exam. Please try again.");
-    }
-  };
-
-  const handleDeleteExam = async (id: number) => {
-    try {
-      await deleteExam(id);
-      fetchExams();
-    } catch (err) {
-      setError("Failed to delete exam. Please try again.");
-    }
-  };
-
-  const handleStartExam = (examId: number) => {
-    navigate(`/exam/${examId}/questions`); // Redirect to questions page
-  };
-
-  if (loading) return <p className="loading-text">Loading exams...</p>;
-  if (error) return <p className="error-text">{error}</p>;
 
   return (
-    <div className="dashboard-container">
-      <h1 className="dashboard-title">Dashboard</h1>
-      <h2 className="section-title">Upcoming Exams</h2>
+    <header className="header" style={styles.navbar}>
+      <nav>
+        <ul style={styles.menu}>
+          {isLoggedIn && (
+            <>
+              <li style={styles.menuItem}>
+                <NavLink
+                  to="/dashboard"
+                  style={({ isActive }) =>
+                    isActive ? { ...styles.menuItem, ...styles.activeTab } : styles.menuItem
+                  }
+                >
+                  Dashboard
+                </NavLink>
+              </li>
+              <li style={styles.menuItem}>
+                <NavLink
+                  to="/aptitudeTest"
+                  style={({ isActive }) =>
+                    isActive ? { ...styles.menuItem, ...styles.activeTab } : styles.menuItem
+                  }
+                >
+                  Aptitude Test
+                </NavLink>
+              </li>
+              <li style={styles.menuItem}>
+                <NavLink
+                  to="/editQuestions"
+                  style={({ isActive }) =>
+                    isActive ? { ...styles.menuItem, ...styles.activeTab } : styles.menuItem
+                  }
+                >
+                  Edit Questions
+                </NavLink>
+              </li>
+              <li style={styles.menuItem}>
+                <button onClick={handleLogout}>Logout</button>
+              </li>
+            </>
+          )}
 
-      {/* Add New Exam */}
-      <div className="exam-form">
-        <h3>{editingExam ? "Edit Exam" : "Create Exam"}</h3>
-        <input
-          type="text"
-          placeholder="Title"
-          value={editingExam ? editingExam.title : newExam.title || ""}
-          onChange={(e) =>
-            editingExam
-              ? setEditingExam({ ...editingExam, title: e.target.value })
-              : setNewExam({ ...newExam, title: e.target.value })
-          }
-        />
-        <input
-          type="datetime-local"
-          placeholder="Start Time"
-          value={editingExam ? editingExam.start_time : newExam.start_time || ""}
-          onChange={(e) =>
-            editingExam
-              ? setEditingExam({ ...editingExam, start_time: e.target.value })
-              : setNewExam({ ...newExam, start_time: e.target.value })
-          }
-        />
-        <input
-          type="datetime-local"
-          placeholder="End Time"
-          value={editingExam ? editingExam.end_time : newExam.end_time || ""}
-          onChange={(e) =>
-            editingExam
-              ? setEditingExam({ ...editingExam, end_time: e.target.value })
-              : setNewExam({ ...newExam, end_time: e.target.value })
-          }
-        />
-        <select
-          value={editingExam ? (editingExam.is_live ? "true" : "false") : newExam.is_live ? "true" : "false"}
-          onChange={(e) =>
-            editingExam
-              ? setEditingExam({ ...editingExam, is_live: e.target.value === "true" })
-              : setNewExam({ ...newExam, is_live: e.target.value === "true" })
-          }
-        >
-          <option value="true">Live</option>
-          <option value="false">Not Live</option>
-        </select>
-        {editingExam ? (
-          <button onClick={handleEditExam}>Update Exam</button>
-        ) : (
-          <button onClick={handleCreateExam}>Add Exam</button>
-        )}
-      </div>
-
-      {/* Display Exams */}
-      {exams.length > 0 ? (
-        <div className="exam-list">
-          {exams.map((exam) => (
-            <div key={exam.id} className="exam-card">
-              <p className="exam-title"><strong>{exam.title}</strong></p>
-              <p className="exam-datetime">Start: {new Date(exam.start_time).toLocaleString()}</p>
-              <p className="exam-datetime">End: {new Date(exam.end_time).toLocaleString()}</p>
-              <p className={`exam-status ${exam.is_live ? "live" : "not-live"}`}>
-                Status: {exam.is_live ? "Live" : "Not Live"}
-              </p>
-              <button onClick={() => handleStartExam(exam.id)} className="start-button">
-                Start Exam
-              </button>
-              <button onClick={() => setEditingExam(exam)} className="edit-button">Edit</button>
-              <button onClick={() => handleDeleteExam(exam.id)} className="delete-button">Delete</button>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="no-exams">No upcoming exams available.</p>
-      )}
-    </div>
+          {!isLoggedIn && (
+            <>
+              <li style={styles.menuItem}>
+                <NavLink
+                  to="/login"
+                  style={({ isActive }) =>
+                    isActive ? { ...styles.menuItem, ...styles.activeTab } : styles.menuItem
+                  }
+                >
+                  Login
+                </NavLink>
+              </li>
+              <li style={styles.menuItem}>
+                <NavLink
+                  to="/signup"
+                  style={({ isActive }) =>
+                    isActive ? { ...styles.menuItem, ...styles.activeTab } : styles.menuItem
+                  }
+                >
+                  Signup
+                </NavLink>
+              </li>
+            </>
+          )}
+        </ul>
+      </nav>
+    </header>
   );
 };
 
-export default Dashboard;
+const styles = {
+  navbar: {
+    background: '#333',
+    color: 'white',
+    padding: '10px 20px',
+    display: 'flex',
+    justifyContent: 'center', // Center the navigation horizontally
+  },
+  menu: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    listStyle: 'none',
+    gap: '40px', // Adjust gap to create more spacing between tabs
+    margin: 0,
+    padding: 0,
+  },
+  menuItem: {
+    fontSize: '1.1rem',
+    color: 'white',
+    textDecoration: 'none',
+    padding: '10px 15px', // Add padding for better click area
+    borderRadius: '5px', // Rounded corners
+    transition: 'background-color 0.3s ease', // Smooth hover effect
+  },
+  activeTab: {
+    fontWeight: 'bold',
+    textDecoration: 'underline',
+    color: 'yellow',
+    backgroundColor: '#444', // Background for active tab
+  },
+};
+
+export default Header;
