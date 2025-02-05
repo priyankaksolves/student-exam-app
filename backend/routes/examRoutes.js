@@ -231,5 +231,21 @@ router.post("/:examId/submit", async (req, res) => {
     }
 });
 
+router.get("/:examId/score/:userId", async (req,res)=>{
+    try{
+        const {examId, userId} = req.params;
+        const submission = await ExamSubmission.findOne({
+            where: {examId: examId}
+        });
+        if (!submission){
+            return res.status(404).json({message: "No submission found for this exam"});
+        }
+        res.json({score: submission.score});
+    } catch (err){
+        console.error("Fetch Score Error:", err);
+        res.status(500).json({error: err.message});
+    }
+})
+
 
 module.exports = router;

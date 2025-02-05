@@ -19,6 +19,7 @@ const Dashboard: React.FC = () => {
   const [newExam, setNewExam] = useState<Partial<Exam>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const navigate = useNavigate();
+  const userId = 1; // Replace with actual user ID from authentication
 
   useEffect(() => {
     fetchExams();
@@ -36,11 +37,24 @@ const Dashboard: React.FC = () => {
   };
 
   const handleCreateExam = async () => {
+    if (!newExam.title || !newExam.start_time || !newExam.end_time) {
+      setError("All fields are required.");
+      return;
+    }
+  
+    const payload = { 
+      ...newExam, 
+      created_by: userId // Ensure created_by is included
+    };
+  
+    console.log("Creating Exam with payload:", payload); // ✅ Debug log
+  
     try {
-      await createExam(newExam);
-      setNewExam({});
+      await createExam(payload);
+      setNewExam({ title: "", start_time: "", end_time: "", is_live: false }); // Clear form
       fetchExams();
     } catch (err) {
+      console.error("Create Exam Error:", err);
       setError("Failed to create exam. Please try again.");
     }
   };
