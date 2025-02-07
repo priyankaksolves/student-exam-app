@@ -56,6 +56,12 @@ export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exams/$
 
 // **Aptitude Test APIs**
 
+// Get all questions (without specifying an exam)
+export const getAllQuestions = async () => {
+  return api.get(`/questions`);
+};
+
+
 // Get all questions for an exam
 export const getExamQuestions = async (examId: number) => {
   return api.get(`/exams/${examId}/questions`);

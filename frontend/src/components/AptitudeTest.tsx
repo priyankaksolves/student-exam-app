@@ -44,21 +44,21 @@ const AptitudeTest = () => {
     }
   };
 
-  const handleSelect = (questionId: number, optionId: string) => {
+  const handleSelect = (questionId: number, selectedText: string) => {
     setSelectedAnswers((prev) => ({
       ...prev,
-      [questionId]: optionId,
+      [questionId]: selectedText, // Store the selected option text instead of ID
     }));
   };
 
   const handleSubmit = async () => {
     if (!examId) return;
-
+  
     const answers = Object.keys(selectedAnswers).map((questionId) => ({
       questionId: Number(questionId),
-      selectedOption: selectedAnswers[Number(questionId)],
+      selectedOption: selectedAnswers[Number(questionId)], // Correct selected answer text
     }));
-
+  
     try {
       await submitExamAnswers(Number(userId), Number(examId), answers);
       const response = await getExamScore(Number(examId), userId);
@@ -83,8 +83,8 @@ const AptitudeTest = () => {
                     type="radio"
                     name={`question-${q.id}`}
                     className="option-input"
-                    checked={selectedAnswers[q.id] === opt.id}
-                    onChange={() => handleSelect(q.id, opt.id)}
+                    checked={selectedAnswers[q.id] === opt.text} // Compare with text
+                    onChange={() => handleSelect(q.id, opt.text)} // Pass text instead of ID
                   />
                   {opt.text}
                 </label>

@@ -69,7 +69,7 @@ router.put("/questions/:questionId", async (req, res) => {
     }
 });
 
-// Delete a Question
+// Delete a Questionreq
 router.delete("/questions/:questionId", async (req, res) => {
     try {
         const { questionId } = req.params;
@@ -205,6 +205,7 @@ router.post("/:examId/submit", async (req, res) => {
         // Compare submitted answers with correct ones
         answers.forEach((answer) => {
             const question = questions.find((q) => q.id === answer.questionId);
+            console.log("Question:", question + answer.selectedOption);
             if (question && question.correct_answer === answer.selectedOption) {
                 score++;
             }
@@ -235,7 +236,7 @@ router.get("/:examId/score/:userId", async (req,res)=>{
     try{
         const {examId, userId} = req.params;
         const submission = await ExamSubmission.findOne({
-            where: {examId: examId}
+            where: {exam_id: examId}
         });
         if (!submission){
             return res.status(404).json({message: "No submission found for this exam"});

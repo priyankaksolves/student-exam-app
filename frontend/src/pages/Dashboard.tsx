@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getExams, createExam, updateExam, deleteExam } from "../api"; // Import exam APIs
 import "../styles/Dashboard.css";
+import { useAuth } from "../authContext/AuthContext";
 
 interface Exam {
   id: number;
@@ -19,7 +20,7 @@ const Dashboard: React.FC = () => {
   const [newExam, setNewExam] = useState<Partial<Exam>>({});
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const navigate = useNavigate();
-  const userId = 1; // Replace with actual user ID from authentication
+  const { userId } = useAuth();
 
   useEffect(() => {
     fetchExams();
@@ -83,6 +84,7 @@ const Dashboard: React.FC = () => {
     navigate(`/exam/${examId}/questions`);
   };
 
+  
   if (loading) return <p className="loading-text">Loading exams...</p>;
   if (error) return <p className="error-text">{error}</p>;
 

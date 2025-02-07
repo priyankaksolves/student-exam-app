@@ -15,9 +15,9 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const { token } = await loginUser(email, password); // Call API
+      const { token, user } = await loginUser(email, password); // Call API
       localStorage.setItem('token', token); // Store token for authentication
-      login(); // Update auth context state
+      login(user.id); // Update auth context state
       debugger;
       navigate('/dashboard'); // Redirect after successful login
     } catch (err: any) {
