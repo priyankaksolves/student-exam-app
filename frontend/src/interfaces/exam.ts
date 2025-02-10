@@ -2,10 +2,10 @@
 export interface Exam {
   id: number;
   title: string;
-  description: string;
+  description?: string;
   startTime: string;
-  endTime: number;
+  endTime: string;
   isLive: boolean;
-  createdBy: string;
+  createdBy?: number;
   // Add other properties as needed
 }

@@ -3,6 +3,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./routes/userRoutes"); // assuming userRoutes is in a "routes" folder
 const examRoutes = require("./routes/examRoutes");
+const questionRoutes = require("./routes/questionRoutes");
+
 require("dotenv").config();
 
 const app = express();
@@ -19,6 +21,7 @@ app.use(bodyParser.json());
 // Routes
 app.use("/api/users", userRoutes); // Use your user routes here
 app.use("/api/exams", examRoutes);
+app.use("/api/questions", questionRoutes);
 
 
 // Start server

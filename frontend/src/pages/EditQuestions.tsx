@@ -1,46 +1,76 @@
-import { useEffect, useState } from "react";
-import { fetchAptitudeQuestions, updateQuestion } from "../api_old";
-import "../styles/EditQuestions.css";
+import React, { useEffect, useState } from 'react';
+import { getAllQuestions, updateQuestion, deleteQuestion } from '../api'; // Import API functions
+import '../styles/EditQuestions.css'; // Import styles
 
 interface Question {
   id: number;
-  question: string;
+  question_text: string;
+  options: string[];
 }
 
-function EditQuestions() {
+const EditQuestions: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [editedQuestion, setEditedQuestion] = useState<{ [key: number]: string }>({});
+  const [editedQuestions, setEditedQuestions] = useState<{ [key: number]: Partial<Question> }>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAptitudeQuestions()
-      .then((response) => {
-        setQuestions(response.data);
-      })
-      .catch(() => setError("Failed to fetch questions"));
+    fetchQuestions();
   }, []);
 
-  const handleUpdate = async (id: number) => {
-    if (!editedQuestion[id]) {
-      setError("Question text cannot be empty.");
-      return;
-    }
-
+  const fetchQuestions = async () => {
     try {
-      await updateQuestion(id, { question: editedQuestion[id] });
+      const response = await getAllQuestions();
+      setQuestions(response.data);
+    } catch (err) {
+      setError('Failed to fetch questions. Please try again.');
+    }
+  };
 
-      setQuestions((prevQuestions) =>
-        prevQuestions.map((q) => (q.id === id ? { ...q, question: editedQuestion[id] } : q))
-      );
+  const handleInputChange = (questionId: number, field: string, value: string) => {
+    setEditedQuestions((prev) => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        [field]: value,
+      },
+    }));
+  };
 
-      setError(null);
+  const handleUpdateQuestion = async (id: number) => {
+    try {
+      const updatedQuestion = editedQuestions[id];
+  
+      if (updatedQuestion) {
+        // Ensure correct_answer is provided
+        const questionData = {
+          question_text: updatedQuestion.question_text ?? questions.find(q => q.id === id)?.question_text ?? '',
+          options: updatedQuestion.options ?? questions.find(q => q.id === id)?.options ?? [],
+          correct_answer: questions.find(q => q.id === id)?.options[0] ?? '' // Default to first option
+        };
+  
+        await updateQuestion(id, questionData);
+  
+        setQuestions((prev) =>
+          prev.map((q) => (q.id === id ? { ...q, ...questionData } : q))
+        );
+  
+        setEditedQuestions((prev) => {
+          const { [id]: _, ...rest } = prev;
+          return rest;
+        });
+      }
     } catch (err) {
       setError(`Failed to update question with ID ${id}`);
     }
   };
 
-  const handleInputChange = (id: number, value: string) => {
-    setEditedQuestion((prev) => ({ ...prev, [id]: value }));
+  const handleDeleteQuestion = async (id: number) => {
+    try {
+      await deleteQuestion(id);
+      setQuestions((prev) => prev.filter((q) => q.id !== id));
+    } catch (err) {
+      setError(`Failed to delete question with ID ${id}`);
+    }
   };
 
   return (
@@ -56,11 +86,25 @@ function EditQuestions() {
               <input
                 type="text"
                 className="question-input"
-                value={editedQuestion[q.id] ?? q.question}
-                onChange={(e) => handleInputChange(q.id, e.target.value)}
+                value={editedQuestions[q.id]?.question_text ?? q.question_text}
+                onChange={(e) => handleInputChange(q.id, 'question_text', e.target.value)}
               />
-              <button className="update-button" onClick={() => handleUpdate(q.id)}>
+              {q.options.map((option, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  className="option-input"
+                  value={editedQuestions[q.id]?.options?.[index] ?? option}
+                  onChange={(e) =>
+                    handleInputChange(q.id, `options.${index}`, e.target.value)
+                  }
+                />
+              ))}
+              <button onClick={() => handleUpdateQuestion(q.id)} className="update-button">
                 Update
+              </button>
+              <button onClick={() => handleDeleteQuestion(q.id)} className="delete-button">
+                Delete
               </button>
             </div>
           ))}
@@ -68,6 +112,6 @@ function EditQuestions() {
       )}
     </div>
   );
-}
+};
 
 export default EditQuestions;

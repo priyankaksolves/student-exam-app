@@ -205,7 +205,6 @@ router.post("/:examId/submit", async (req, res) => {
         // Compare submitted answers with correct ones
         answers.forEach((answer) => {
             const question = questions.find((q) => q.id === answer.questionId);
-            console.log("Question:", question + answer.selectedOption);
             if (question && question.correct_answer === answer.selectedOption) {
                 score++;
             }
@@ -247,6 +246,8 @@ router.get("/:examId/score/:userId", async (req,res)=>{
         res.status(500).json({error: err.message});
     }
 })
+
+
 
 
 module.exports = router;

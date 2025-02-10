@@ -10,7 +10,6 @@ const router = express.Router();
 // Register
 router.post("/register", async (req, res) => {
     try {
-        console.log("Received Body:", req.body);
         const { name, email, password, role } = req.body;
 
         if (!name || !email || !password || !role) {
@@ -32,23 +31,16 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
     try {
-        console.log("Received Body:", req.body);
         const { email, password } = req.body;
 
         const user = await User.findOne({ where: { email } });
-
-        console.log("User found:", user);
 
         if (!user) {
             return res.status(401).json({ message: "User not found" });
         }
 
-        console.log("Stored Password Hash:", user.password);
-        console.log("Entered Password:", password);
-
         // Compare entered password with the hashed password in DB
         const passwordMatch = await bcrypt.compare(password, user.password);
-        console.log("Password Match Result:", passwordMatch);
 
         if (!passwordMatch) {
             return res.status(401).json({ message: "Invalid credentials" });

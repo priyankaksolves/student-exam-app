@@ -50,7 +50,18 @@ export const logoutUser = () => {
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exams/${id}`);
 export const getExams = async () => axios.get(`${API_URL}/exams`);
-export const createExam = async (examData: Partial<Exam>) => axios.post(`${API_URL}/exams`, examData);
+export const createExam = async (examData: Partial<Exam>) => {
+  
+  const formattedExamData = {
+    title: examData.title,
+    start_time: examData.startTime, // Convert to valid datetime
+    end_time: examData.endTime, // Convert to valid datetime
+    is_live: examData.isLive,
+    created_by: examData.createdBy,
+  };
+
+  return axios.post(`${API_URL}/exams`, formattedExamData);
+};
 export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exams/${id}`, updatedExam);
 export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exams/${id}`);
 
@@ -58,7 +69,7 @@ export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exams/$
 
 // Get all questions (without specifying an exam)
 export const getAllQuestions = async () => {
-  return api.get(`/questions`);
+  return api.get(`/questions/allquestions`);
 };
 
 

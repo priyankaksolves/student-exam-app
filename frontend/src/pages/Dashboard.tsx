@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
     navigate(`/exam/${examId}/questions`);
   };
 
-  
+
   if (loading) return <p className="loading-text">Loading exams...</p>;
   if (error) return <p className="error-text">{error}</p>;
 
@@ -154,7 +154,8 @@ const Dashboard: React.FC = () => {
                 Status: {exam.is_live ? "Live" : "Not Live"}
               </p>
               <button onClick={() => handleStartExam(exam.id)} className="start-button">Start Exam</button>
-              <button onClick={() => setEditingExam(exam)} className="edit-button">Edit</button>
+              <button onClick={() => navigate("/create-exam")}>Create Exam</button>
+              <button onClick={() => navigate(`/edit-exam/${exam.id}`)}>Edit</button>
               <button onClick={() => handleDeleteExam(exam.id)} className="delete-button">Delete</button>
             </div>
           ))}

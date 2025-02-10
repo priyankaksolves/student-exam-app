@@ -6,6 +6,7 @@ const Question = require("..//models/question");
 const Exam = sequelize.define("Exam", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: true },
     start_time: { type: DataTypes.DATE, allowNull: false },
     end_time: { type: DataTypes.DATE, allowNull: false },
     is_live: { type: DataTypes.BOOLEAN, defaultValue: false }, // New property
