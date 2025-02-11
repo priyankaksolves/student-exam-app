@@ -1,66 +1,143 @@
 /* EditQuestions.css */
-
 .edit-container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.edit-title {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.error-text {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.add-question-form {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.add-question-form h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.question-input,
+.option-input,
+.correct-answer-select {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.correct-answer-select {
+  background: #fff;
+  cursor: pointer;
+}
+
+.add-button {
+  width: 100%;
+  padding: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-button:hover {
+  background: #0056b3;
+}
+
+.questions-list {
+  margin-top: 20px;
+}
+
+.question-card {
+  background: #f1f1f1;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.update-button,
+.delete-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.update-button {
+  background: #28a745;
+  color: white;
+}
+
+.update-button:hover {
+  background: #218838;
+}
+
+.delete-button {
+  background: #dc3545;
+  color: white;
+  margin-left: 10px;
+}
+
+.delete-button:hover {
+  background: #c82333;
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .edit-container {
+    width: 90%;
+    padding: 15px;
   }
   
-  .edit-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .error-text {
-    color: red;
+  .question-input,
+  .option-input,
+  .correct-answer-select {
     font-size: 14px;
   }
-  
-  .loading-text {
-    font-size: 16px;
-    color: #666;
+
+  .update-button,
+  .delete-button {
+    font-size: 12px;
+    padding: 6px 10px;
   }
-  
-  .questions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .question-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #f9f9f9;
-  }
-  
-  .question-input {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .update-button {
-    padding: 8px 15px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .update-button:hover {
-    background-color: #0056b3;
-  }
-  
+}
+
+.correct-answer {
+  background-color: #d4edda !important; /* Light green background */
+  border: 2px solid #28a745 !important; /* Green border */
+  font-weight: bold;
+  color: #155724;
+}

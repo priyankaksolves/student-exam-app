@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getExamById, addQuestion, deleteQuestion } from "../api";
+import { getExamById, addQuestionToExam, deleteQuestion } from "../api";
 
 interface Question {
   id: number;
@@ -38,7 +38,7 @@ const EditExam: React.FC = () => {
     }
 
     try {
-      const response = await addQuestion(Number(examId), newQuestion);
+      const response = await addQuestionToExam(Number(examId), newQuestion);
       setQuestions([...questions, response.data]);
       setNewQuestion({ question_text: "", options: ["", "", "", ""], correct_answer: "" });
     } catch (err) {

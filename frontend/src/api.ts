@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Exam } from "./interfaces/exam";
+import { Question } from "./interfaces/Question";
 
 const API_URL = "http://localhost:5000/api"; // Base API URL
 
@@ -94,7 +95,7 @@ export const getQuestionsByExamId = async (examId: number) => {
 };
 
 // **NEW: Add a question to an exam**
-export const addQuestion = async (examId: number, questionData: { question_text: string; options: string[]; correct_answer: string }) => {
+export const addQuestionToExam = async (examId: number, questionData: { question_text: string; options: string[]; correct_answer: string }) => {
   return api.post(`/exams/${examId}/questions`, questionData);
 };
 
@@ -103,9 +104,23 @@ export const updateQuestion = async (questionId: number, questionData: { questio
   return api.put(`/questions/${questionId}`, questionData);
 };
 
-// **NEW: Delete a question**
-export const deleteQuestion = async (questionId: number) => {
-  return api.delete(`/questions/${questionId}`);
+export const deleteQuestion = async (id: number) => {
+  try {
+    const response = await axios.delete(`${API_URL}/questions/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    throw error;
+  }
+};
+
+export const addQuestion = async (newQuestion: Question, examId: number) => {
+  return api.post(`/questions/addquestion`, {
+    question_text: newQuestion.question_text,
+    options: newQuestion.options,
+    correct_answer: newQuestion.correct_answer,
+    exam_id: examId,  // ✅ Pass the exam_id
+  });
 };
 
 export default api;
