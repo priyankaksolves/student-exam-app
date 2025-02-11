@@ -62,5 +62,29 @@ router.delete('/:id', async (req, res) => {
     }
   });
 
+  router.put('/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { question_text, options, correct_answer } = req.body;
+  
+      const question = await Question.findByPk(id);
+      if (!question) {
+        return res.status(404).json({ message: 'Question not found' });
+      }
+  
+      question.question_text = question_text || question.question_text;
+      question.options = options || question.options;
+      question.correct_answer = correct_answer || question.correct_answer;
+  
+      await question.save();
+  
+      res.json({ message: 'Question updated successfully', question });
+    } catch (error) {
+      console.error('Error updating question:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
+
 
 module.exports = router;

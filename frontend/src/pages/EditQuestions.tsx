@@ -42,49 +42,54 @@ const EditQuestions: React.FC = () => {
     }
   };
 
-  const handleInputChange = (
-    questionId: number,
-    field: string,
-    value: string
-  ) => {
-    setEditedQuestions((prev) => ({
-      ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        [field]: value,
-      },
-    }));
+  const handleInputChange = (questionId: number, field: string, value: string, index?: number) => {
+    setEditedQuestions((prev) => {
+      const existingQuestion = prev[questionId] || {};
+      return {
+        ...prev,
+        [questionId]: {
+          ...existingQuestion,
+          [field]: index !== undefined
+            ? (existingQuestion.options
+              ? [...existingQuestion.options.slice(0, index), value, ...existingQuestion.options.slice(index + 1)]
+              : questions.find(q => q.id === questionId)?.options.map((opt, i) => (i === index ? value : opt)) || [])
+            : value,
+        },
+      };
+    });
   };
+  
 
-  const handleUpdateQuestion = async (id: number) => {
-    try {
-      const updatedQuestion = editedQuestions[id];
-      if (updatedQuestion) {
-        const questionData = {
-          question_text:
-            updatedQuestion.question_text ??
-            questions.find((q) => q.id === id)?.question_text ??
-            "",
-          options:
-            updatedQuestion.options ??
-            questions.find((q) => q.id === id)?.options ??
-            [],
-          correct_answer: questions.find((q) => q.id === id)?.options[0] ?? "",
-        };
+const handleUpdateQuestion = async (id: number) => {
+  try {
+    const updatedQuestion = editedQuestions[id];
 
-        await updateQuestion(id, questionData);
-        setQuestions((prev) =>
-          prev.map((q) => (q.id === id ? { ...q, ...questionData } : q))
-        );
-        setEditedQuestions((prev) => {
-          const { [id]: _, ...rest } = prev;
-          return rest;
-        });
-      }
-    } catch (err) {
-      setError(`Failed to update question with ID ${id}`);
+    if (updatedQuestion) {
+      const existingQuestion = questions.find(q => q.id === id);
+      if (!existingQuestion) return;
+
+      const questionData = {
+        question_text: updatedQuestion.question_text ?? existingQuestion.question_text,
+        options: updatedQuestion.options ?? existingQuestion.options,
+        correct_answer: updatedQuestion.correct_answer ?? existingQuestion.correct_answer,
+      };
+
+      await updateQuestion(id, questionData);
+
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, ...questionData } : q))
+      );
+
+      setEditedQuestions((prev) => {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      });
     }
-  };
+  } catch (err) {
+    setError(`Failed to update question with ID ${id}`);
+  }
+};
+
 
   const handleDeleteQuestion = async (id: number) => {
     const confirmDelete = window.confirm(
