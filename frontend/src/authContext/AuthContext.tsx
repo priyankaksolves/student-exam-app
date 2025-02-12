@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -8,7 +8,7 @@ interface AuthContextType {
 }
 
 interface AuthProviderProps {
-  children: ReactNode; // Allow children to be any valid React node
+  children: ReactNode;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,9 +17,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<number | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Load authentication state from localStorage on app startup
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(Number(storedUserId));
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const login = (userId: number) => {
     console.log('Logging in...');
-
     setIsLoggedIn(true);
     setUserId(userId);
     localStorage.setItem("userId", String(userId)); // Save to local storage
@@ -29,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log('Logging out...');
     setIsLoggedIn(false);
     setUserId(null);
-    localStorage.removeItem("userId"); // Optionally clear from local storage
+    localStorage.removeItem("userId"); // Clear from local storage
   };
 
   console.log('AuthProvider isLoggedIn:', isLoggedIn, 'UserId:', userId);

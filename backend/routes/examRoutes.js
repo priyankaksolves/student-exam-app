@@ -2,6 +2,7 @@ const express = require("express");
 const Exam = require("../models/exam");
 const Question = require("../models/question");
 const ExamSubmission = require("../models/examSubmission");
+const ExamQuestion = require("../models/examQuestion");
 const router = express.Router();
 
 // Create an Exam with a Custom List of Questions
@@ -246,6 +247,34 @@ router.get("/:examId/score/:userId", async (req,res)=>{
         res.status(500).json({error: err.message});
     }
 })
+
+// Create Exam with Linked Questions
+
+router.post("/createexam", async (req, res) => {
+    try {
+        console.log("📩 Received Request Body:", req.body);
+
+        const { title, start_time, end_time, is_live, created_by, question_ids } = req.body;
+
+        if (!title || !start_time || !end_time || !created_by) {
+            return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        // ✅ Create the exam
+        const newExam = await Exam.create({ title, start_time, end_time, is_live, created_by });
+
+        // ✅ If questions are provided, associate them with the exam
+        if (question_ids && question_ids.length > 0) {
+            await newExam.setQuestions(question_ids); // Sequelize handles ExamQuestion automatically
+        }
+
+        res.status(201).json(newExam);
+    } catch (err) {
+        console.error("❌ Error creating exam:", err);
+        res.status(500).json({ error: "Failed to create exam" });
+    }
+});
+
 
 
 

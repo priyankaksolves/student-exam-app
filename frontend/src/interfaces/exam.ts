@@ -7,5 +7,6 @@ export interface Exam {
   endTime: string;
   isLive: boolean;
   createdBy?: number;
+  question_ids?: number[];
   // Add other properties as needed
 }
