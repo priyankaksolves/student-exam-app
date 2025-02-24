@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getExams, createExam, updateExam, deleteExam } from "../api"; // Import exam APIs
+import { getAllExams, createExam, updateExam, deleteExam, getExamQuestions } from "../api"; // Import exam APIs
 import "../styles/Dashboard.css";
 import { useAuth } from "../authContext/AuthContext";
 
@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
 
   const fetchExams = async () => {
     try {
-      const response = await getExams();
+      const response = await getAllExams();
       setExams(response.data);
     } catch (err) {
       setError("Failed to fetch exams. Please try again.");
@@ -80,9 +80,20 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleStartExam = (examId: number) => {
-    navigate(`/exam/${examId}/questions`);
+  const handleStartExam = async (examId: number) => {
+    try {
+      const response = await getExamQuestions(examId);
+      if (response.data.length > 0) {
+        navigate(`/aptitude-test/${examId}`);
+      } else {
+        alert("No questions available for this exam.");
+      }
+    } catch (error) {
+      console.error("Error fetching exam questions:", error);
+      alert("Failed to load exam questions. Try again later.");
+    }
   };
+  
 
 
   if (loading) return <p className="loading-text">Loading exams...</p>;
@@ -143,7 +154,7 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {exams.length > 0 ? (
+      {exams?.length > 0 ? (
         <div className="exam-list">
           {exams.map((exam) => (
             <div key={exam.id} className="exam-card">

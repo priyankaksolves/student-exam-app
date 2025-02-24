@@ -3,69 +3,83 @@ import { useParams } from "react-router-dom";
 import { getExamQuestions, submitExamAnswers, getExamScore } from "../api";
 import "../styles/AptitudeTest.css";
 
-// Updated Question interface to match API response
 interface Question {
   id: number;
-  question_text: string; // Updated field name
-  options: { id: string; text: string }[]; // Transformed options
+  question_text: string;
+  options: { id: string; text: string }[];
 }
 
 const AptitudeTest = () => {
-  const { examId } = useParams<{ examId: string }>(); // Get examId from URL params
+  const { examId } = useParams<{ examId: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: string }>({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const userId = 1; // Replace with actual user ID from authentication
 
   useEffect(() => {
-    debugger;
-    fetchQuestions();
+    if (examId) {
+      fetchQuestions();
+    }
   }, [examId]);
 
-  const fetchQuestions = () => {
-    if (examId) {
-      getExamQuestions(Number(examId))
-        .then((response) => {
-          // Transform API response to match the expected structure
-          const formattedQuestions = response.data.map((q: any) => ({
-            id: q.id,
-            question_text: q.question_text,
-            options: q.options.map((opt: string, index: number) => ({
-              id: `${q.id}-${index}`, // Unique ID for options
-              text: opt,
-            })),
-          }));
-          setQuestions(formattedQuestions);
-        })
-        .catch((error) => {
-          console.error("Error fetching questions:", error);
-        });
+  const fetchQuestions = async () => {
+    try {
+      setLoading(true);
+      const response = await getExamQuestions(Number(examId));
+      
+      if (response?.data?.length > 0) {
+        const formattedQuestions: Question[] = response.data.map((q: any) => ({
+          id: q.id,
+          question_text: q.question_text,
+          options: q.options.map((opt: string, index: number) => ({
+            id: `${q.id}-${index}`,
+            text: opt,
+          })),
+        }));
+        setQuestions(formattedQuestions);
+      } else {
+        setError("No questions found for this exam.");
+      }
+    } catch (err) {
+      setError("Error fetching questions. Please try again later.");
+      console.error("Error fetching questions:", err);
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   const handleSelect = (questionId: number, selectedText: string) => {
     setSelectedAnswers((prev) => ({
       ...prev,
-      [questionId]: selectedText, // Store the selected option text instead of ID
+      [questionId]: selectedText,
     }));
   };
 
   const handleSubmit = async () => {
     if (!examId) return;
-  
-    const answers = Object.keys(selectedAnswers).map((questionId) => ({
+
+    const answers = Object.entries(selectedAnswers).map(([questionId, selectedOption]) => ({
       questionId: Number(questionId),
-      selectedOption: selectedAnswers[Number(questionId)], // Correct selected answer text
+      selectedOption,
     }));
-  
+
     try {
       await submitExamAnswers(Number(userId), Number(examId), answers);
       const response = await getExamScore(Number(examId), userId);
-      setScore(response.data.score);
+      if (response?.data?.score !== undefined) {
+        setScore(response.data.score);
+      } else {
+        setError("Could not retrieve score. Try again.");
+      }
       setSubmitted(true);
-    } catch (error) {
-      console.error("Error submitting answers:", error);
+    } catch (err) {
+      setError("Error submitting exam. Please try again.");
+      console.error("Error submitting answers:", err);
     }
   };
 
@@ -73,7 +87,12 @@ const AptitudeTest = () => {
     <div className="test-container">
       <div className="test-card">
         <h1 className="test-title">Aptitude Test</h1>
-        {questions.length > 0 ? (
+
+        {loading ? (
+          <p className="loading-text">Loading questions...</p>
+        ) : error ? (
+          <p className="error-text">{error}</p>
+        ) : questions.length > 0 ? (
           questions.map((q) => (
             <div key={q.id} className="question-container">
               <h3 className="question-text">{q.question_text}</h3>
@@ -83,8 +102,8 @@ const AptitudeTest = () => {
                     type="radio"
                     name={`question-${q.id}`}
                     className="option-input"
-                    checked={selectedAnswers[q.id] === opt.text} // Compare with text
-                    onChange={() => handleSelect(q.id, opt.text)} // Pass text instead of ID
+                    checked={selectedAnswers[q.id] === opt.text}
+                    onChange={() => handleSelect(q.id, opt.text)}
                   />
                   {opt.text}
                 </label>
@@ -92,14 +111,16 @@ const AptitudeTest = () => {
             </div>
           ))
         ) : (
-          <p className="loading-text">Loading questions...</p>
+          <p className="loading-text">No questions available.</p>
         )}
 
         <button onClick={handleSubmit} disabled={submitted} className="submit-button">
           Submit Test
         </button>
 
-        {submitted && <h2 className="score-text">Your Score: {score} / {questions.length}</h2>}
+        {submitted && (
+          <h2 className="score-text">Your Score: {score} / {questions.length}</h2>
+        )}
       </div>
     </div>
   );

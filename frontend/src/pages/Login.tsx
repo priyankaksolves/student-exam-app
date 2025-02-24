@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../authContext/AuthContext';
 import { loginUser } from '../api'; // Import API function
+import { jwtDecode } from 'jwt-decode';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,20 +11,28 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
+  
     try {
-      const { token, user } = await loginUser(email, password); // Call API
-      localStorage.setItem('token', token); // Store token for authentication
-      login(user.id); // Update auth context state
-      debugger;
-      navigate('/dashboard'); // Redirect after successful login
+      const response = await loginUser(email, password);
+      if (!response.token) throw new Error('Invalid login response');
+  
+      localStorage.setItem('token', response.token);
+  
+      // Decode JWT to extract user info
+      const decodedToken: any = jwtDecode(response.token);
+      login(decodedToken.user_id); // Pass user_id from decoded token
+  
+      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Invalid credentials'); // Handle errors
+      setError(err.message || 'Invalid credentials');
     }
   };
+  
+  
 
   return (
     <div style={{ maxWidth: '500px', margin: '50px auto', padding: '30px', textAlign: 'center' }}>

@@ -4,7 +4,8 @@ import { registerUser } from "../api"; // Import API function
 import styles from "../styles/Signup.module.css"; // Import CSS module
 
 const Signup: React.FC = () => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
@@ -16,7 +17,7 @@ const Signup: React.FC = () => {
     setError("");
 
     try {
-      await registerUser({ name, email, password, role });
+      await registerUser({ firstName, lastName, email, password, role });
       alert("Signup successful!");
       navigate("/login");
     } catch (err: any) {
@@ -32,9 +33,17 @@ const Signup: React.FC = () => {
         <input
           className={styles.input}
           type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+                <input
+          className={styles.input}
+          type="text"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
           required
         />
         <input

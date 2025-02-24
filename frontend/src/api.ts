@@ -22,14 +22,26 @@ export const loginUser = async (email: string, password: string) => {
   }).then((res) => res.json());
 };
 
-export const registerUser = async (userData: { name: string; email: string; password: string; role: string }) => {
-  return fetch(`${API_URL}/users/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(userData),
-    credentials: "include",
-  }).then((res) => res.json());
+
+export const registerUser = async (userData: { firstName: string; lastName: string; email: string; password: string; role: string }) => {
+  try {
+    const response = await axios.post(`${API_URL}/users/signup`, 
+      {
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role,
+      }
+    );
+
+    return response.data;  // Axios automatically parses JSON
+  } catch (error) {
+    console.error("Signup Error:", error);
+    throw error;
+  }
 };
+
 
 // Get User Profile (Protected Route)
 export const getUserProfile = async (token: string) => {
@@ -50,7 +62,12 @@ export const logoutUser = () => {
 
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exams/${id}`);
-export const getExams = async () => axios.get(`${API_URL}/exams`);
+
+export const getAllExams = async () => {
+  const response = await axios.get(`${API_URL}/exam`);
+  return response.data.exams; // Directly return the exams array
+};
+
 export const createExam = async (examData: Partial<Exam>) => {
   debugger;
   const formattedExamData = {
@@ -116,7 +133,7 @@ export const deleteQuestion = async (id: number) => {
   }
 };
 
-export const addQuestion = async (newQuestion: Question, examId: number) => {
+export const addQuestion = async (newQuestion: Question , examId: number) => {
   return api.post(`/questions/addquestion`, {
     question_text: newQuestion.question_text,
     options: newQuestion.options,
