@@ -14,12 +14,12 @@ const api = axios.create({
 
 // User Authentication APIs
 export const loginUser = async (email: string, password: string) => {
-  return fetch(`${API_URL}/users/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-    credentials: "include",
-  }).then((res) => res.json());
+
+  const response = await axios.post(`${API_URL}/users/login`, 
+    { email, password }
+  );
+
+  return response.data;
 };
 
 
@@ -35,7 +35,7 @@ export const registerUser = async (userData: { firstName: string; lastName: stri
       }
     );
 
-    return response.data;  // Axios automatically parses JSON
+    return response.data;
   } catch (error) {
     console.error("Signup Error:", error);
     throw error;
@@ -159,5 +159,64 @@ export const addQuestion = async (examId: number, newQuestion: Question) => {
 export const getQuestionsForExam = async (examId: number) => {
   return api.get(`/exam/${examId}`);
 };
+
+
+export const startExam = async (examId: number) => {
+  return api.patch(`/student-exam/${examId}/start`)
+    .then(response => response.data) // Returns { message: 'Exam Started', leftTime }
+    .catch(error => {
+      if (axios.isAxiosError(error) && error.response) {
+        throw error.response.data;
+      } else {
+        throw { message: "Failed to start exam." };
+      }
+    });
+};
+
+// Fetch all students
+export const getAllStudents = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/users/getUsers`, { role: "student" });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to load students.");
+  }
+};
+
+// Assign an exam to a student
+export const assignExamToStudent = async (examData: {
+  student_id: number;
+  exam_id: number;
+  start_time: string;
+}) => {
+  try {
+    const response = await axios.post(`${API_URL}/student-exam`, examData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to assign exam.");
+  }
+};
+
+
+// Fetch assigned exams for a student
+export const getStudentExams = async (studentId: number) => {
+  try {
+    const response = await axios.get(`${API_URL}/student-exams/${studentId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to fetch exams.");
+  }
+};
+
+// Start an exam
+export const startStudentExam = async (studentExamId: number) => {
+  try {
+    const response = await axios.post(`${API_URL}/student-exams/start/${studentExamId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to start exam.");
+  }
+};
+
 
 export default api;
