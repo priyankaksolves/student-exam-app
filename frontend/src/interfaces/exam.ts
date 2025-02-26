@@ -1,12 +1,13 @@
+import { Question } from "./Question";
+
 // Create an exam
 export interface Exam {
-  id: number;
+  exam_id: number;
   title: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  isLive: boolean;
-  createdBy?: number;
-  question_ids?: number[];
-  // Add other properties as needed
+  description: string;
+  duration: number;
+  type: "aptitude" | "coding";
+  pass_marks: number;
+  created_by: number;
+  questions: Question[];
 }

@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Exam } from "./interfaces/exam";
 import { Question } from "./interfaces/Question";
+import { Exam } from "./interfaces/exam";
 
 const API_URL = "http://localhost:5000/api"; // Base API URL
 
@@ -69,18 +69,18 @@ export const getAllExams = async () => {
 };
 
 export const createExam = async (examData: Partial<Exam>) => {
-  debugger;
   const formattedExamData = {
     title: examData.title,
-    start_time: new Date(examData.startTime!).toISOString(), // Convert to valid datetime
-    end_time: new Date(examData.endTime!).toISOString(), // Convert to valid datetime
-    is_live: examData.isLive,
-    created_by: examData.createdBy, 
-    question_ids: examData.question_ids || [], // Ensure we send question_ids
+    duration: examData.duration || "", // Ensure description is included
+    type: examData.type,
+    pass_marks: examData.pass_marks ?? 0, // Ensure pass_marks is included
+    created_by: 1, // examData.created_by,
+    questions: examData.questions || [], // Ensure we send questions
   };
 
-  return axios.post(`${API_URL}/exams/createexam`, formattedExamData);
+  return axios.post(`${API_URL}/exam/`, formattedExamData);
 };
+
 
 export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exams/${id}`, updatedExam);
 export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exams/${id}`);
@@ -133,13 +133,31 @@ export const deleteQuestion = async (id: number) => {
   }
 };
 
-export const addQuestion = async (newQuestion: Question , examId: number) => {
-  return api.post(`/questions/addquestion`, {
-    question_text: newQuestion.question_text,
-    options: newQuestion.options,
-    correct_answer: newQuestion.correct_answer,
-    exam_id: examId,  // ✅ Pass the exam_id
+export const addQuestion = async (examId: number, newQuestion: Question) => {
+  return api.post(`/exam/${examId}/question/add`, {
+    questions: [
+      {
+        exam_id: examId,
+        question_text: newQuestion.question_text,
+        question_type: newQuestion.question_type,
+        marks: Number(newQuestion.marks), // ✅ Ensure marks is a number
+        correct_answer: newQuestion.correct_answer,
+        options:
+          newQuestion.question_type === "multiple_choice" || newQuestion.question_type === "multi_select"
+            ? newQuestion.options?.map((option) => ({
+              option_text: option.option_text, // ✅ Ensure text is included
+                is_correct: option.is_correct || false, // ✅ At least one must be true
+              })) || []
+            : [],
+      },
+    ],
   });
+};
+
+
+// Fetch existing questions for an exam
+export const getQuestionsForExam = async (examId: number) => {
+  return api.get(`/exam/${examId}`);
 };
 
 export default api;

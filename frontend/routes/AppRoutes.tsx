@@ -26,7 +26,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/EditQuestions" element={<EditQuestions/>} />
           <Route path="/create-exam" element={<CreateExam />} />
           <Route path="/edit-exam/:id" element={<EditExam />} />
-          <Route path="/exam/:id/add-questions" element={<AddQuestions />} />
+          <Route path="/exam/:examId/add-questions" element={<AddQuestions />} />
 
         </Routes>
       </div>
