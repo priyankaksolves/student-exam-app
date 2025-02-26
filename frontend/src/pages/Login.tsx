@@ -24,9 +24,15 @@ const Login: React.FC = () => {
   
       // Decode JWT to extract user info
       const decodedToken: any = jwtDecode(response.token);
-      login(decodedToken.user_id); // Pass user_id from decoded token
+      login(decodedToken.user_id, decodedToken.role); // Pass user_id from decoded token
   
-      navigate('/dashboard');
+      if(decodedToken.role === 'student') {
+        navigate('/studentdashboard');
+      }
+      else {
+        navigate('/dashboard');
+      }
+
     } catch (err: any) {
       setError(err.message || 'Invalid credentials');
     }
