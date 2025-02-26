@@ -1,139 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getAllQuestions, createExam } from '../api'; // Import API functions
-import '../styles/CreateExam.css'; // Import styles
+import { useState } from "react";
+import { createExam } from "../api";
+import { useAuth } from "../authContext/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Exam } from "../interfaces/exam";
 
-interface Question {
-  id: number;
-  question_text: string;
-  options: string[];
-}
 
 const CreateExam: React.FC = () => {
-  const [title, setTitle] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [isLive, setIsLive] = useState(false);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
   const navigate = useNavigate();
+  const { userId } = useAuth();
+  const [examData, setExamData] = useState<Partial<Exam>>({
+    title: "",
+    description: "",
+    duration: 10,
+    type: "aptitude",
+    pass_marks: 0,
+    created_by: userId ?? 0,
+    questions: [],
+  });
 
-  useEffect(() => {
-    // Fetch available questions using getAllQuestions from api.ts
-    const fetchQuestions = async () => {
-      try {
-        const response = await getAllQuestions();
-        setQuestions(response.data); // Assuming response.data contains the questions array
-      } catch (error) {
-        console.error("Error fetching questions:", error);
-      }
-    };
+  const [error, setError] = useState<string | null>(null);
 
-    fetchQuestions();
-  }, []);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setExamData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleCreateExam = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!examData.title || !examData.duration || !examData.type || !examData.pass_marks) {
+      setError("All fields are required.");
+      return;
+    }
     try {
-      const userId = localStorage.getItem("userId"); // Get user ID from localStorage
-  
-      if (!userId) {
-        alert("User not logged in!");
-        return;
-      }
-  
-      // Ensure start_time and end_time are properly formatted
-      if (!startTime || !endTime) {
-        alert("Please select valid start and end times!");
-        return;
-      }
-  
-      const formattedStartTime = new Date(startTime).toISOString();
-      const formattedEndTime = new Date(endTime).toISOString();
-  
-      const examData = {
-        title,
-        startTime: formattedStartTime,  // Ensure correct property names
-        endTime: formattedEndTime,
-        isLive,
-        createdBy: parseInt(userId, 10), // Ensure correct property name and convert to number
-        question_ids: selectedQuestions, // Ensure we send `question_ids`
-      };
-  
-      console.log("✅ Exam Payload:", examData); // Debugging
-  
-      await createExam(examData);
-      navigate('/dashboard'); // Redirect after successful creation
-    } catch (error) {
-      console.error("❌ Error creating exam:", error);
+      await createExam({ ...examData, created_by: userId ?? 0 });
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Failed to create exam. Please try again.");
     }
   };
-  
-
 
   return (
     <div className="create-exam-container">
-      <h1 className="create-exam-title">Create Exam</h1>
-      <form onSubmit={(e) => { e.preventDefault(); handleCreateExam(); }}>
-        <div className="form-group">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="startTime">Start Time</label>
-          <input
-            type="datetime-local"
-            id="startTime"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="endTime">End Time</label>
-          <input
-            type="datetime-local"
-            id="endTime"
-            value={endTime}
-            onChange={(e) => {setEndTime(e.target.value)}}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="isLive">Is Live</label>
-          <input
-            type="checkbox"
-            id="isLive"
-            checked={isLive}
-            onChange={(e) => setIsLive(e.target.checked)}
-          />
-        </div>
-        <div className="form-group">
-          <label>Select Questions</label>
-          {questions.map((question) => (
-            <div key={question.id}>
-              <input
-                type="checkbox"
-                value={question.id}
-                onChange={(e) => {
-                  const questionId = Number(e.target.value);
-                  setSelectedQuestions((prev) =>
-                    e.target.checked
-                      ? [...prev, questionId]
-                      : prev.filter((id) => id !== questionId)
-                  );
-                }}
-              />
-              {question.question_text}
-            </div>
-          ))}
-        </div>
-        <button type="submit" className="create-exam-button">Create Exam</button>
+      <h2>Create Exam</h2>
+      {error && <p className="error">{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="title" placeholder="Title" value={examData.title} onChange={handleChange} required />
+        <textarea name="description" placeholder="Description" value={examData.description} onChange={handleChange}></textarea>
+        <input type="number" name="duration" placeholder="Duration (minutes)" value={examData.duration} onChange={handleChange} required />
+        <select name="type" value={examData.type} onChange={handleChange} required>
+          <option value="aptitude">Aptitude</option>
+          <option value="coding">Coding</option>
+        </select>
+        <input type="number" name="pass_marks" placeholder="Pass Marks" value={examData.pass_marks} onChange={handleChange} required />
+        <button type="submit">Create Exam</button>
       </form>
     </div>
   );

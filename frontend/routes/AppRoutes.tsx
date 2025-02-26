@@ -9,6 +9,7 @@ import AptitudeTest from "../src/components/AptitudeTest";
 import EditQuestions from "../src/pages/EditQuestions";
 import CreateExam from "../src/pages/CreateExam";
 import EditExam from "../src/pages/EditExam";
+import AddQuestions from "../src/components/AddQuestions";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -25,6 +26,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/EditQuestions" element={<EditQuestions/>} />
           <Route path="/create-exam" element={<CreateExam />} />
           <Route path="/edit-exam/:id" element={<EditExam />} />
+          <Route path="/exam/:id/add-questions" element={<AddQuestions />} />
+
         </Routes>
       </div>
     </Router>
