@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllExams } from "../api";
+import { getAllExams, deleteExam } from "../api"; // ✅ Import deleteExam
 import { useNavigate } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
 import { Button, Container, Table, Alert, Spinner } from "react-bootstrap";
@@ -9,6 +9,7 @@ const Dashboard: React.FC = () => {
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null); // ✅ Track deletion status
 
   useEffect(() => {
     fetchExams();
@@ -17,11 +18,26 @@ const Dashboard: React.FC = () => {
   const fetchExams = async () => {
     try {
       const response = await getAllExams();
-      setExams(response); // Assuming API returns { exams: [...] }
+      setExams(response);
     } catch (err) {
       setError("Failed to load exams. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ✅ Handle exam deletion
+  const handleDelete = async (examId: number) => {
+    if (!window.confirm("Are you sure you want to delete this exam?")) return; // Confirm before delete
+
+    setDeleting(examId); // Indicate that the exam is being deleted
+    try {
+      await deleteExam(examId);
+      setExams((prevExams) => prevExams.filter((exam) => exam.exam_id !== examId)); // Remove deleted exam
+    } catch (err) {
+      setError("Failed to delete the exam.");
+    } finally {
+      setDeleting(null); // Reset deleting state
     }
   };
 
@@ -64,7 +80,13 @@ const Dashboard: React.FC = () => {
                   >
                     View
                   </Button>
-                  <Button variant="danger">Delete</Button>
+                  <Button
+                    variant="danger"
+                    disabled={deleting === exam.exam_id} // ✅ Disable button during deletion
+                    onClick={() => handleDelete(exam.exam_id)}
+                  >
+                    {deleting === exam.exam_id ? "Deleting..." : "Delete"}
+                  </Button>
                 </td>
               </tr>
             ))}
