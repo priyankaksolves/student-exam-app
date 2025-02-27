@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStudentExams, startStudentExam } from "../api";
+import api, { getExamById, getStudentExams, startStudentExam } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Container, Table, Button, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -35,15 +35,9 @@ const StudentDashboard: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const handleStartExam = async (studentExamId: number) => {
-    try {
-      const response = await startStudentExam(studentExamId);
-      alert(response.message || "Exam Started!");
-      navigate(`/exam/${studentExamId}`); // Navigate to the exam page
-    } catch (err: any) {
-      alert(err.message || "Failed to start the exam.");
-    }
+  
+  const handleStartExam = async (examId: number) => {
+    navigate(`/exam/${examId}`); // No need to pass exam details
   };
 
   return (
@@ -57,7 +51,7 @@ const StudentDashboard: React.FC = () => {
         <Table striped bordered hover className="mt-3">
           <thead>
             <tr>
-              <th>Exam ID</th>
+              <th>Student Exam ID</th>
               <th>Start Time</th>
               <th>End Time</th>
               <th>Status</th>
@@ -67,7 +61,7 @@ const StudentDashboard: React.FC = () => {
           <tbody>
             {exams.map((exam) => (
               <tr key={exam.student_exam_id}>
-                <td>{exam.exam_id}</td>
+                <td>{exam.student_exam_id}</td>
                 <td>{new Date(exam.start_time).toLocaleString()}</td>
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
                 <td>{exam.status}</td>
@@ -77,7 +71,7 @@ const StudentDashboard: React.FC = () => {
                   ) : (
                     <Button
                       variant="primary"
-                      onClick={() => handleStartExam(exam.student_exam_id)}
+                      onClick={() => handleStartExam(exam.exam_id)}
                       disabled={exam.status !== "not_started"}
                     >
                       Start Exam

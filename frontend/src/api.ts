@@ -61,7 +61,7 @@ export const logoutUser = () => {
 };
 
 // Exam APIs
-export const getExamById = async (id: number) => api.get(`/exams/${id}`);
+export const getExamById = async (id: number) => api.get(`/exam/${id}`);
 
 export const getAllExams = async () => {
   const response = await axios.get(`${API_URL}/exam`);
@@ -216,6 +216,11 @@ export const startStudentExam = async (studentExamId: number) => {
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to start exam.");
   }
+};
+
+// Submit Exam
+export const submitExam = async (studentExamId: number, responses: any[]) => {
+  return axios.post(`${API_URL}/student-response/${studentExamId}`, { responses });
 };
 
 export default api;

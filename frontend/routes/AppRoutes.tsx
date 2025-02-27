@@ -6,7 +6,6 @@ import Signup from "../src/pages/Signup";
 import Header from "../src/components/Header";
 import Dashboard from "../src/pages/Dashboard";
 import AptitudeTest from "../src/components/AptitudeTest";
-import EditQuestions from "../src/pages/EditQuestions";
 import CreateExam from "../src/pages/CreateExam";
 import EditExam from "../src/pages/EditExam";
 import AddQuestions from "../src/components/AddQuestions";
@@ -15,6 +14,7 @@ import ProtectedRoute from "../src/components/ProtectedRoute";
 import RoleBasedRedirect from "../src/components/RoleBasedRedirec";
 import { Spinner } from "react-bootstrap";
 import { useAuth } from "../src/authContext/AuthContext";
+import ExamPage from "../src/pages/ExamPage";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/edit-exam/:id" element={<ProtectedRoute accessRole="admin"><EditExam /></ProtectedRoute>} />
           <Route path="/exam/:examId/add-questions" element={<ProtectedRoute accessRole="admin"><AddQuestions /></ProtectedRoute>} />
           <Route path="/studentdashboard" element={<ProtectedRoute accessRole="student"><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/exam/:examId" element={<ProtectedRoute accessRole="student"><ExamPage /></ProtectedRoute>} />
+
         </Routes>
       </div>
     </Router>
