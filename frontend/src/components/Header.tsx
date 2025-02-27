@@ -6,11 +6,12 @@ const Header: React.FC = () => {
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isLoggedIn && window.location.pathname === "/login") {
-      navigate("/dashboard");
-    }
-  }, [isLoggedIn, navigate]);
+  // useEffect(() => {
+  //   if (isLoggedIn && window.location.pathname === "/login") {
+  //     debugger;
+  //     navigate('/dashboard');
+  //   }
+  // }, [isLoggedIn, navigate]);
 
   const handleLogout = () => {
     logout();
