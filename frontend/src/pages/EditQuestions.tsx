@@ -132,7 +132,7 @@ const handleUpdateQuestion = async (id: number) => {
 
     try {     
        const examId = 1; // Replace with actual exam_id (e.g., from state or props)
-      const response = await addQuestion(newQuestion, examId);
+      const response = await addQuestion(examId, newQuestion);
       setQuestions([...questions, response.data]);
 
       // Reset form fields

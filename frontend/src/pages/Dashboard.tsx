@@ -6,7 +6,6 @@ import { Button, Container, Table, Alert, Spinner, Form } from "react-bootstrap"
 import { useAuth } from "../authContext/AuthContext";
 import { User } from "../interfaces/User";
 
-
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const { role } = useAuth(); // Get user role
@@ -64,7 +63,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container className="mt-4">
-      <h2 className="mb-4">Admin - Assign Exams to Students</h2>
+      <h2 className="mb-4">Admin - Assign & Edit Exams</h2>
 
       {loading && <Spinner animation="border" role="status" />}
       {error && <Alert variant="danger">{error}</Alert>}
@@ -94,6 +93,7 @@ const Dashboard: React.FC = () => {
               <th>Pass Marks</th>
               <th>Duration (mins)</th>
               <th>Assign Exam</th>
+              <th>Edit Exam</th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +111,14 @@ const Dashboard: React.FC = () => {
                     disabled={!selectedStudent}
                   >
                     Assign to Student
+                  </Button>
+                </td>
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate(`/exam/${exam.exam_id}/add-questions/`)}
+                  >
+                    Edit Exam
                   </Button>
                 </td>
               </tr>

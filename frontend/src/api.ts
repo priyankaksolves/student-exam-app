@@ -218,5 +218,4 @@ export const startStudentExam = async (studentExamId: number) => {
   }
 };
 
-
 export default api;
