@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api, { getExamById, getStudentExams, startStudentExam } from "../api";
+import { getStudentExams } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Container, Table, Button, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -10,8 +10,7 @@ interface StudentExam {
   status: "not_started" | "in_progress" | "completed";
   start_time: string;
   end_time: string;
-  started_at?: string;
-  score?: number; // Assuming score is stored in DB
+  score?: number;
 }
 
 const StudentDashboard: React.FC = () => {
@@ -35,9 +34,9 @@ const StudentDashboard: React.FC = () => {
       setLoading(false);
     }
   };
-  
-  const handleStartExam = async (examId: number) => {
-    navigate(`/exam/${examId}`); // No need to pass exam details
+
+  const handleStartExam = async (examId: number, studentExamId: number) => {
+    navigate(`/exam/${examId}/${studentExamId}`);
   };
 
   return (
@@ -64,18 +63,18 @@ const StudentDashboard: React.FC = () => {
                 <td>{exam.student_exam_id}</td>
                 <td>{new Date(exam.start_time).toLocaleString()}</td>
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
-                <td>{exam.status}</td>
                 <td>
-                  {exam.status === "completed" ? (
-                    <strong>Score: {exam.score || "N/A"}</strong>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      onClick={() => handleStartExam(exam.exam_id)}
-                      disabled={exam.status !== "not_started"}
-                    >
+                  {exam.status === "completed"
+                    ? `Completed (Score: ${exam.score ?? "N/A"})`
+                    : exam.status}
+                </td>
+                <td>
+                  {exam.status === "not_started" ? (
+                    <Button variant="primary" onClick={() => handleStartExam(exam.exam_id, exam.student_exam_id)}>
                       Start Exam
                     </Button>
+                  ) : (
+                    <span>-</span>
                   )}
                 </td>
               </tr>

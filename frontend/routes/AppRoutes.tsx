@@ -50,7 +50,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/edit-exam/:id" element={<ProtectedRoute accessRole="admin"><EditExam /></ProtectedRoute>} />
           <Route path="/exam/:examId/add-questions" element={<ProtectedRoute accessRole="admin"><AddQuestions /></ProtectedRoute>} />
           <Route path="/studentdashboard" element={<ProtectedRoute accessRole="student"><StudentDashboard /></ProtectedRoute>} />
-          <Route path="/exam/:examId" element={<ProtectedRoute accessRole="student"><ExamPage /></ProtectedRoute>} />
+          <Route path="/exam/:examId/:studentExamId" element={<ProtectedRoute accessRole="student"><ExamPage /></ProtectedRoute>} />
 
         </Routes>
       </div>

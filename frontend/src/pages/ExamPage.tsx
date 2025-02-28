@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Button, Spinner, Alert, Form } from "react-bootstrap";
-import { getExamById, submitExam } from "../api"; // Import API functions
+import { declareResult, getExamById, submitExam } from "../api"; // Import API functions
 
 const ExamPage: React.FC = () => {
-  const { examId } = useParams(); // Get exam ID from URL
+  const { examId, studentExamId } = useParams(); // Get exam ID from URL
   const navigate = useNavigate();
   
   const [exam, setExam] = useState<any>(null);
@@ -43,21 +43,36 @@ const ExamPage: React.FC = () => {
   };
 
   // Handle exam submission
+
+  // Handle exam submission
   const handleSubmit = async () => {
     try {
       const formattedResponses = Object.entries(responses).map(([questionId, selectedOptionId]) => ({
         question_id: Number(questionId),
         selected_option_id: selectedOptionId,
       }));
-
-      // Submit API Call
-      const submitResponse = await submitExam(Number(examId), formattedResponses);
-      alert(submitResponse.data.message); // Show success message
-      navigate("/dashboard"); // Redirect after submission
+  
+      // Submit Exam API Call
+      const submitResponse = await submitExam(Number(studentExamId), formattedResponses);
+      alert(submitResponse.data.message);
+  
+      console.log("Submitting declareResult with studentExamId:", studentExamId); // ✅ Debug log
+  
+      if (studentExamId) {
+        // Declare result only if studentExamId is valid
+        const resultResponse = await declareResult(Number(studentExamId));
+        console.log("Result Declared:", resultResponse);
+      } else {
+        console.error("Error: studentExamId is missing!");
+      }
+  
+      navigate("/studentdashboard");
     } catch (err: any) {
+      console.error("API Error:", err);
       alert("Failed to submit exam.");
     }
   };
+  
 
   if (loading) return <Spinner animation="border" />;
   if (error) return <Alert variant="danger">{error}</Alert>;

@@ -223,4 +223,9 @@ export const submitExam = async (studentExamId: number, responses: any[]) => {
   return axios.post(`${API_URL}/student-response/${studentExamId}`, { responses });
 };
 
+export const declareResult = async (studentExamId: number) => {
+  const response = await axios.post(`${API_URL}/result/exam/${studentExamId}`);
+  return response.data;
+};
+
 export default api;
