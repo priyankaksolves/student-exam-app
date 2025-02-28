@@ -9,5 +9,6 @@ export interface Exam {
   type: "aptitude" | "coding";
   pass_marks: number;
   created_by: number;
+  is_live: boolean;
   questions: Question[];
 }

@@ -228,4 +228,8 @@ export const declareResult = async (studentExamId: number) => {
   return response.data;
 };
 
+export const updateExamStatus = async (examId: number, isLive: boolean) => {
+  return axios.patch(`${API_URL}/exam/${examId}/live`, { is_live: isLive });
+};
+
 export default api;
