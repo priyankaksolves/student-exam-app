@@ -238,4 +238,8 @@ export const getResult = async (studentExamId: number) => {
     throw new Error(error.response?.data?.message || "Failed to get score.");
   }
 };
+export const updateExamStatus = async (examId: number, isLive: boolean) => {
+  return axios.patch(`${API_URL}/exam/${examId}/live`, { is_live: isLive });
+};
+
 export default api;

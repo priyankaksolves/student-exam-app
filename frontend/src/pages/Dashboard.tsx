@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllExams, getAllStudents, assignExamToStudent } from "../api"; // Import student functions
+import { getAllExams, getAllStudents, assignExamToStudent, updateExamStatus } from "../api"; // Import student functions
 import { useNavigate } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
 import { Button, Container, Table, Alert, Spinner, Form } from "react-bootstrap";
@@ -61,6 +61,27 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleToggleLiveStatus = async (examId: number, currentStatus: boolean) => {
+    try {
+      const response = await updateExamStatus(examId, !currentStatus);
+
+      const data = response.data;
+
+      alert(data.message);
+
+      setExams((prevExams) =>
+        prevExams.map((exam) =>
+          exam.exam_id === examId ? { ...exam, is_live: !currentStatus } : exam
+        )
+      );
+    } catch (error: any) {
+      alert(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    }
+  };
+
   return (
     <Container className="mt-4">
       <h2 className="mb-4">Admin - Assign & Edit Exams</h2>
@@ -93,7 +114,7 @@ const Dashboard: React.FC = () => {
               <th>Pass Marks</th>
               <th>Duration (mins)</th>
               <th>Assign Exam</th>
-              <th>Edit Exam</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -113,13 +134,36 @@ const Dashboard: React.FC = () => {
                     Assign to Student
                   </Button>
                 </td>
-                <td>
+                <td className="d-flex align-items-center">
                   <Button
                     variant="primary"
-                    onClick={() => navigate(`/exam/${exam.exam_id}/add-questions/`)}
+                    onClick={() =>
+                      navigate(`/exam/${exam.exam_id}/add-questions/`)
+                    }
                   >
                     Edit Exam
                   </Button>
+                  <div className="form-check form-switch ms-4">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`toggleLive-${exam.exam_id}`}
+                      checked={exam.is_live}
+                      onChange={() =>
+                        handleToggleLiveStatus(exam.exam_id, exam.is_live)
+                      }
+                    />
+                    <label
+                      className={`form-check-label ${
+                        exam.is_live
+                          ? "text-success fw-bold"
+                          : "text-danger fw-bold"
+                      }`}
+                      htmlFor={`toggleLive-${exam.exam_id}`}
+                    >
+                      {exam.is_live ? "Active" : "Inactive"}
+                    </label>
+                  </div>
                 </td>
               </tr>
             ))}
