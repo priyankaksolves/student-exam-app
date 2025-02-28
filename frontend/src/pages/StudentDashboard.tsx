@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStudentExams } from "../api";
+import { getResult, getStudentExams } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Container, Table, Button, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +39,20 @@ const StudentDashboard: React.FC = () => {
     navigate(`/exam/${examId}/${studentExamId}`);
   };
 
+  const showResult = async (studentExamId: number | undefined) => {
+    if (!studentExamId) {
+      console.error("Error: studentExamId is undefined!");
+      return;
+    }
+  
+    try {
+      navigate(`/result/${studentExamId}`);
+    } catch (err: any) {
+      setError("Failed to get result.");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Container className="mt-4">
       <h2>Student Dashboard</h2>
@@ -69,14 +83,19 @@ const StudentDashboard: React.FC = () => {
                     : exam.status}
                 </td>
                 <td>
-                  {exam.status === "not_started" ? (
-                    <Button variant="primary" onClick={() => handleStartExam(exam.exam_id, exam.student_exam_id)}>
+                  {exam.status === "not_started" && (
+                    <Button
+                      onClick={() => handleStartExam(exam.exam_id, exam.student_exam_id)}
+                    >
                       Start Exam
                     </Button>
-                  ) : (
-                    <span>-</span>
                   )}
-                </td>
+                  {exam.status === "completed" && (
+                    <Button onClick={() => showResult(exam.student_exam_id)}>
+                      Show Result
+                    </Button>
+                  )}
+                </td> 
               </tr>
             ))}
           </tbody>

@@ -228,4 +228,14 @@ export const declareResult = async (studentExamId: number) => {
   return response.data;
 };
 
+
+// Fetch assigned exams for a student
+export const getResult = async (studentExamId: number) => {
+  try {
+    const response = await axios.get(`${API_URL}/result/exam/${studentExamId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to get score.");
+  }
+};
 export default api;

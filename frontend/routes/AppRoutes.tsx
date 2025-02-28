@@ -15,6 +15,7 @@ import RoleBasedRedirect from "../src/components/RoleBasedRedirec";
 import { Spinner } from "react-bootstrap";
 import { useAuth } from "../src/authContext/AuthContext";
 import ExamPage from "../src/pages/ExamPage";
+import ResultPage from "../src/pages/ResultPage";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -51,6 +52,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/exam/:examId/add-questions" element={<ProtectedRoute accessRole="admin"><AddQuestions /></ProtectedRoute>} />
           <Route path="/studentdashboard" element={<ProtectedRoute accessRole="student"><StudentDashboard /></ProtectedRoute>} />
           <Route path="/exam/:examId/:studentExamId" element={<ProtectedRoute accessRole="student"><ExamPage /></ProtectedRoute>} />
+          <Route path="/result/:studentExamId" element={<ProtectedRoute accessRole="student"><ResultPage /></ProtectedRoute>} />
 
         </Routes>
       </div>
