@@ -1,17 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext/AuthContext";
 
 const Header: React.FC = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, role, logout } = useAuth();
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (isLoggedIn && window.location.pathname === "/login") {
-  //     debugger;
-  //     navigate('/dashboard');
-  //   }
-  // }, [isLoggedIn, navigate]);
 
   const handleLogout = () => {
     logout();
@@ -22,7 +15,7 @@ const Header: React.FC = () => {
     <header className="header" style={styles.navbar}>
       <nav>
         <ul style={styles.menu}>
-          {isLoggedIn && (
+          {isLoggedIn && role === "admin" && (
             <>
               <li style={styles.menuItem}>
                 <NavLink
@@ -36,7 +29,6 @@ const Header: React.FC = () => {
                   Dashboard
                 </NavLink>
               </li>
-
               <li style={styles.menuItem}>
                 <NavLink
                   to="/create-exam"
@@ -49,14 +41,31 @@ const Header: React.FC = () => {
                   Create Exam
                 </NavLink>
               </li>
-
-              <li style={styles.menuItem}>
-                <button onClick={handleLogout}>Logout</button>
-              </li>
             </>
           )}
 
-          {!isLoggedIn && (
+          {isLoggedIn && role === "student" && (
+            <li style={styles.menuItem}>
+              <NavLink
+                to="/studentdashboard"
+                style={({ isActive }) =>
+                  isActive
+                    ? { ...styles.menuItem, ...styles.activeTab }
+                    : styles.menuItem
+                }
+              >
+                Student Dashboard
+              </NavLink>
+            </li>
+          )}
+
+          {isLoggedIn ? (
+            <li style={styles.menuItem}>
+              <button onClick={handleLogout} style={styles.logoutButton}>
+                Logout
+              </button>
+            </li>
+          ) : (
             <>
               <li style={styles.menuItem}>
                 <NavLink
@@ -120,6 +129,16 @@ const styles = {
     textDecoration: "underline",
     color: "yellow",
     backgroundColor: "#444",
+  },
+  logoutButton: {
+    fontSize: "1.1rem",
+    backgroundColor: "red",
+    color: "white",
+    padding: "8px 15px",
+    borderRadius: "5px",
+    border: "none",
+    cursor: "pointer",
+    transition: "background-color 0.3s ease",
   },
 };
 
