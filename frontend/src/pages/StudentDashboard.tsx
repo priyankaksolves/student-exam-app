@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getResult, getStudentExams } from "../api";
+import { getStudentExams } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Container, Table, Button, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -79,8 +79,7 @@ const StudentDashboard: React.FC = () => {
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
                 <td>
                   {exam.status === "completed"
-                    ? `Completed (Score: ${exam.score ?? "N/A"})`
-                    : exam.status}
+                    ? 'Completed': 'not_started'}
                 </td>
                 <td>
                   {exam.status === "not_started" && (

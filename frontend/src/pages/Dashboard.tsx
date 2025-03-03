@@ -1,19 +1,33 @@
 import { useEffect, useState } from "react";
-import { getAllExams, getAllStudents, assignExamToStudent, updateExamStatus } from "../api"; // Import student functions
+import {
+  getAllExams,
+  getAllStudents,
+  assignExamToStudent,
+  updateExamStatus,
+} from "../api";
 import { useNavigate } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
-import { Button, Container, Table, Alert, Spinner, Form } from "react-bootstrap";
-import { useAuth } from "../authContext/AuthContext";
+import {
+  Button,
+  Container,
+  Table,
+  Alert,
+  Spinner,
+  Form,
+  Modal,
+} from "react-bootstrap";
 import { User } from "../interfaces/User";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { role } = useAuth(); // Get user role
   const [exams, setExams] = useState<Exam[]>([]);
   const [students, setStudents] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<number | "">("");
+  const [selectedExam, setSelectedExam] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [startTime, setStartTime] = useState<string>("");
 
   useEffect(() => {
     fetchExams();
@@ -40,35 +54,51 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleAssignExam = async (examId: number) => {
+  // Open modal & set selected exam
+  const openAssignExamModal = (examId: number) => {
     if (!selectedStudent) {
-      alert("Please select a student.");
+      alert("Please select a student first.");
+      return;
+    }
+    console.log("Opening modal for Exam ID:", examId);
+    setSelectedExam(examId);
+    setShowModal(true);
+  };
+
+  const handleAssignExam = async () => {
+    if (!selectedStudent || !selectedExam || !startTime) {
+      alert("Please select a student, exam, and start time.");
       return;
     }
 
+    console.log("Assigning exam with data:", {
+      student_id: selectedStudent,
+      exam_id: selectedExam,
+      start_time: new Date(startTime).toISOString(),
+    });
+
     try {
-      const startTime = new Date();
-      startTime.setHours(new Date().getHours() + 1); // Set exam start time to 1 hour from now
       const response = await assignExamToStudent({
         student_id: selectedStudent,
-        exam_id: examId,
-        start_time: startTime.toISOString(),
+        exam_id: selectedExam,
+        start_time: new Date(startTime).toISOString(),
       });
 
       alert(response.message || "Exam assigned successfully!");
+      setShowModal(false); // Close modal after assignment
     } catch (error: any) {
+      console.error("Assignment failed:", error);
       alert(error.message || "Failed to assign exam.");
     }
   };
 
-  const handleToggleLiveStatus = async (examId: number, currentStatus: boolean) => {
+  const handleToggleLiveStatus = async (
+    examId: number,
+    currentStatus: boolean
+  ) => {
     try {
       const response = await updateExamStatus(examId, !currentStatus);
-
-      const data = response.data;
-
-      alert(data.message);
-
+      alert(response.data.message);
       setExams((prevExams) =>
         prevExams.map((exam) =>
           exam.exam_id === examId ? { ...exam, is_live: !currentStatus } : exam
@@ -128,7 +158,13 @@ const Dashboard: React.FC = () => {
                 <td>
                   <Button
                     variant="warning"
-                    onClick={() => handleAssignExam(exam.exam_id)}
+                    onClick={() => {
+                      console.log(
+                        "🟢 Button Clicked for Exam ID:",
+                        exam.exam_id
+                      );
+                      openAssignExamModal(exam.exam_id);
+                    }}
                     disabled={!selectedStudent}
                   >
                     Assign to Student
@@ -170,6 +206,35 @@ const Dashboard: React.FC = () => {
           </tbody>
         </Table>
       )}
+
+      {/* Modal for selecting start time */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Select Exam Start Time</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group controlId="examStartTime">
+            <Form.Label>Choose Start Time:</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleAssignExam}
+            disabled={!startTime}
+          >
+            Confirm & Assign
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
