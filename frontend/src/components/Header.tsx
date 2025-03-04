@@ -19,7 +19,7 @@ const Header: React.FC = () => {
             <>
               <li style={styles.menuItem}>
                 <NavLink
-                  to="/dashboard"
+                  to="/admin/dashboard"
                   style={({ isActive }) =>
                     isActive
                       ? { ...styles.menuItem, ...styles.activeTab }
@@ -31,14 +31,14 @@ const Header: React.FC = () => {
               </li>
               <li style={styles.menuItem}>
                 <NavLink
-                  to="/create-exam"
+                  to="/admin/student-exam"
                   style={({ isActive }) =>
                     isActive
                       ? { ...styles.menuItem, ...styles.activeTab }
                       : styles.menuItem
                   }
                 >
-                  Create Exam
+                  Student Exam
                 </NavLink>
               </li>
             </>

@@ -32,7 +32,7 @@ const CreateExam: React.FC = () => {
     }
     try {
       await createExam({ ...examData, created_by: userId ?? 0 });
-      navigate("/dashboard");
+      navigate("/admin/dashboard");
     } catch (err) {
       setError("Failed to create exam. Please try again.");
     }

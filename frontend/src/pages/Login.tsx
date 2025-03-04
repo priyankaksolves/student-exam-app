@@ -30,7 +30,7 @@ const Login: React.FC = () => {
         navigate('/studentdashboard');
       }
       else {
-        navigate('/dashboard');
+        navigate('/admin/dashboard');
       }
 
     } catch (err: any) {

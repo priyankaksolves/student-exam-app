@@ -84,6 +84,7 @@ export const createExam = async (examData: Partial<Exam>) => {
 
 export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exams/${id}`, updatedExam);
 export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exam/${id}`);
+export const deleteStudentExam = async (id: number) => axios.delete(`${API_URL}/student-exam/${id}`);
 
 // **Aptitude Test APIs**
 
