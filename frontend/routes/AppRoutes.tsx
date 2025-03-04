@@ -8,7 +8,6 @@ import AptitudeTest from "../src/components/AptitudeTest";
 import CreateExam from "../src/pages/CreateExam";
 import EditExam from "../src/pages/EditExam";
 import StudentExam from "../src/pages/StudentExam";
-import AddQuestions from "../src/components/AddQuestions";
 import StudentDashboard from "../src/pages/StudentDashboard";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import RoleBasedRedirect from "../src/components/RoleBasedRedirec";
@@ -17,6 +16,7 @@ import { useAuth } from "../src/authContext/AuthContext";
 import ExamPage from "../src/pages/ExamPage";
 import ResultPage from "../src/pages/ResultPage";
 import AdminDashboard from "../src/pages/AdminDashboard";
+import AddQuestions from "../src/pages/AddQuestions";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);

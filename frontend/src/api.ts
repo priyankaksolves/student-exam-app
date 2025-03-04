@@ -134,25 +134,8 @@ export const deleteQuestion = async (id: number) => {
   }
 };
 
-export const addQuestion = async (examId: number, newQuestion: Question) => {
-  return api.post(`/exam/${examId}/question/add`, {
-    questions: [
-      {
-        exam_id: examId,
-        question_text: newQuestion.question_text,
-        question_type: newQuestion.question_type,
-        marks: Number(newQuestion.marks), // ✅ Ensure marks is a number
-        correct_answer: newQuestion.correct_answer,
-        options:
-          newQuestion.question_type === "multiple_choice" || newQuestion.question_type === "multi_select"
-            ? newQuestion.options?.map((option) => ({
-              option_text: option.option_text, // ✅ Ensure text is included
-                is_correct: option.is_correct || false, // ✅ At least one must be true
-              })) || []
-            : [],
-      },
-    ],
-  });
+export const addQuestion = async (examId: number, questions: Question[]) => {
+  return api.post(`/exam/${examId}/question/add`, { questions });
 };
 
 
