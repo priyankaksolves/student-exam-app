@@ -2,13 +2,18 @@ import { addQuestion } from "../api";
 import { Question } from "../interfaces/Question";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface QuestionFormProps {
   examID: number;
+  onQuestionsChange?: (questions: Question[]) => void;
 }
 
-const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
+const QuestionForm: React.FC<QuestionFormProps> = ({
+  examID,
+  onQuestionsChange,
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [questions, setQuestions] = useState<Question[]>([
     {
@@ -23,6 +28,12 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
       correct_answer: undefined,
     },
   ]);
+
+  useEffect(() => {
+    if (onQuestionsChange) {
+      onQuestionsChange(questions);
+    }
+  }, [questions, onQuestionsChange]);
 
   const handleChange = (index: number, field: keyof Question, value: any) => {
     setQuestions((prev) =>
@@ -133,8 +144,17 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    if (containerRef.current) {
+      const inputs = containerRef.current.querySelectorAll("input[required]");
+      for (const input of Array.from(inputs)) {
+        if (!(input as HTMLInputElement).checkValidity()) {
+          (input as HTMLInputElement).reportValidity();
+          return;
+        }
+      }
+    }
     try {
       await addQuestion(Number(examID), questions);
       toast.success("Questions added successfully!");
@@ -145,9 +165,9 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
   };
 
   return (
-    <div>
-      <h2>Add Questions to Exam</h2>
-      <form onSubmit={handleSubmit} className="p-4 shadow">
+    <div ref={containerRef} className="mt-4">
+      {examID !== 0 && <h2>Add Questions to Exam</h2>}
+      <div className="p-4 shadow">
         {questions.map((question, qIndex) => (
           <div
             key={qIndex}
@@ -202,6 +222,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
                     handleChange(qIndex, "marks", Number(e.target.value))
                   }
                   required
+                  min="1"
                 />
               </div>
             </div>
@@ -252,6 +273,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
                       onChange={(e) =>
                         handleOptionChange(qIndex, optIndex, e.target.value)
                       }
+                      required
                     />
                     <input
                       type="checkbox"
@@ -280,10 +302,16 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ examID }) => {
         >
           + Add Another Question
         </button>
-        <button type="submit" className="btn btn-success">
-          Submit
-        </button>
-      </form>
+        {examID != 0 && (
+          <button
+            type="submit"
+            className="btn btn-success"
+            onClick={handleSubmit}
+          >
+            Submit
+          </button>
+        )}
+      </div>
     </div>
   );
 };

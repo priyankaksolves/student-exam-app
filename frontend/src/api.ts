@@ -71,23 +71,12 @@ export const getAllExams = async () => {
 };
 
 export const createExam = async (examData: Partial<Exam>) => {
-  const formattedExamData = {
-    title: examData.title,
-    duration: examData.duration || "", // Ensure description is included
-    type: examData.type,
-    pass_marks: examData.pass_marks ?? 0, // Ensure pass_marks is included
-    created_by: 1, // examData.created_by,
-    questions: examData.questions || [], // Ensure we send questions
-  };
-
-  return axios.post(`${API_URL}/exam/`, formattedExamData);
+  return axios.post(`${API_URL}/exam/`, examData);
 };
 
-export const updateExam = async (id: number, updatedExam: Partial<Exam>) => {
-  axios.put(`${API_URL}/exam/${id}`, updatedExam);
-};
-export const deleteExam = async (id: number) =>
-  axios.delete(`${API_URL}/exam/${id}`);
+
+export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exam/${id}`, updatedExam);
+export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exam/${id}`);
 
 // **Aptitude Test APIs**
 

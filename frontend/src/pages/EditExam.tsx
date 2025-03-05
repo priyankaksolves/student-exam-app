@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getExamById, updateExam } from "../api";
-import { useAuth } from "../authContext/AuthContext";
 import { Exam } from "../interfaces/exam";
 import { toast } from "react-toastify";
+import ExamForm from "../components/ExamForm";
+import { useAuth } from "../authContext/AuthContext";
 
 const UpdateExam: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,7 +61,7 @@ const UpdateExam: React.FC = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="mb-3">Update Exam</h2>
+      <h2 className="mb-3">Edit Exam</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit} className="card p-4 shadow">
         <div className="mb-3">

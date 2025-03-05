@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { getStudentExams } from "../api";
+import { getStudentExams, startExam } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Container, Table, Button, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface StudentExam {
   student_exam_id: number;
@@ -36,7 +37,13 @@ const StudentDashboard: React.FC = () => {
   };
 
   const handleStartExam = async (examId: number, studentExamId: number) => {
-    navigate(`/exam/${examId}/${studentExamId}`);
+    try {
+      await startExam(studentExamId);
+      navigate(`/exam/${examId}/${studentExamId}`);
+      toast.success("Exam started successfully!", { autoClose: 3000 });
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    }
   };
 
   const showResult = async (studentExamId: number | undefined) => {
@@ -44,7 +51,7 @@ const StudentDashboard: React.FC = () => {
       console.error("Error: studentExamId is undefined!");
       return;
     }
-  
+
     try {
       navigate(`/result/${studentExamId}`);
     } catch (err: any) {
@@ -77,14 +84,13 @@ const StudentDashboard: React.FC = () => {
                 <td>{exam.student_exam_id}</td>
                 <td>{new Date(exam.start_time).toLocaleString()}</td>
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
-                <td>
-                  {exam.status === "completed"
-                    ? 'Completed': 'not_started'}
-                </td>
+                <td>{exam.status}</td>
                 <td>
                   {exam.status === "not_started" && (
                     <Button
-                      onClick={() => handleStartExam(exam.exam_id, exam.student_exam_id)}
+                      onClick={() =>
+                        handleStartExam(exam.exam_id, exam.student_exam_id)
+                      }
                     >
                       Start Exam
                     </Button>
@@ -94,7 +100,7 @@ const StudentDashboard: React.FC = () => {
                       Show Result
                     </Button>
                   )}
-                </td> 
+                </td>
               </tr>
             ))}
           </tbody>
