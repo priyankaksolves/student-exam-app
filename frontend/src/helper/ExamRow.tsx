@@ -33,7 +33,7 @@ export const ExamRow: React.FC<ExamRowProps> = ({ exam, onDelete, onToggleLiveSt
       </div>
     </td>
     <td className="d-flex align-items-center">
-      <div className="d-flex align-items-center edit-button me-1" onClick={() => navigate(`/exam/${exam.exam_id}/add-questions/`)}>
+      <div className="d-flex align-items-center edit-button me-1" onClick={() => navigate(`/edit-exam/${exam.exam_id}`)}>
         <i className="bi bi-pencil-square me-1"></i>
         <span> Edit</span>
       </div>

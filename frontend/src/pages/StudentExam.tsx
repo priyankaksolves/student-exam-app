@@ -59,7 +59,7 @@ const StudentExam: React.FC = () => {
   const fetchStudents = async (): Promise<void> => {
     try {
       const response = await axios.get<{ users: Student[] }>(
-        "http://localhost:3000/api/users?role=student"
+        "http://localhost:5000/api/users?role=student"
       );
       setStudents(response.data.users);
     } catch (error) {
@@ -70,7 +70,7 @@ const StudentExam: React.FC = () => {
   const fetchExams = async (): Promise<void> => {
     try {
       const response = await axios.get<{ exams: Exam[] }>(
-        "http://localhost:3000/api/exam"
+        "http://localhost:5000/api/exam"
       );
       setExams(response.data.exams);
     } catch (error) {
@@ -81,7 +81,7 @@ const StudentExam: React.FC = () => {
   const fetchStudentExams = async (): Promise<void> => {
     try {
       const response = await axios.get<{ studentExams: StudentExamRecord[] }>(
-        "http://localhost:3000/api/student-exam"
+        "http://localhost:5000/api/student-exam"
       );
       setStudentExams(response.data.studentExams);
       setLoading(false);
@@ -104,13 +104,13 @@ const StudentExam: React.FC = () => {
   const handleSubmit = async (): Promise<void> => {
     if (!selectedStudent || !selectedExam || !startTime) {
       toast.error("Please select a student, an exam, and a start time.", {
-        autoClose: 3000,
+        autoClose: 5000,
       });
       return;
     }
 
     try {
-      await axios.post("http://localhost:3000/api/student-exam", {
+      await axios.post("http://localhost:5000/api/student-exam", {
         student_id: selectedStudent.value,
         exam_id: selectedExam.value,
         start_time: startTime,
@@ -123,7 +123,7 @@ const StudentExam: React.FC = () => {
       toast.error(
         error.response?.data?.message || "Error creating student exam",
         {
-          autoClose: 3000,
+          autoClose: 5000,
         }
       );
     }
@@ -132,7 +132,7 @@ const StudentExam: React.FC = () => {
   const handleDelete = async (studentexamId: number) => {
     try {
       const response = await deleteStudentExam(studentexamId);
-      toast.success(response.data.message, { autoClose: 3000 });
+      toast.success(response.data.message, { autoClose: 5000 });
       setStudentExams(
         studentExams.filter((exam) => exam.student_exam_id !== studentexamId)
       );
@@ -141,7 +141,7 @@ const StudentExam: React.FC = () => {
         error.response?.data?.message ||
           "Failed to delete exam. Please try again.",
         {
-          autoClose: 3000,
+          autoClose: 5000,
         }
       );
     }

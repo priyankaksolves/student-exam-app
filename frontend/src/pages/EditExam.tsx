@@ -1,106 +1,115 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getExamById, addQuestionToExam, deleteQuestion } from "../api";
+import { getExamById, updateExam } from "../api";
+import { useAuth } from "../authContext/AuthContext";
+import { Exam } from "../interfaces/exam";
 
-interface Question {
-  id: number;
-  question_text: string;
-  options: string[];
-  correct_answer: string;
-}
-
-const EditExam: React.FC = () => {
-  const { examId } = useParams<{ examId: string }>();
-  const [exam, setExam] = useState<any>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [newQuestion, setNewQuestion] = useState({ question_text: "", options: ["", "", "", ""], correct_answer: "" });
-  const [error, setError] = useState<string | null>(null);
+const UpdateExam: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { userId } = useAuth();
+  const [examData, setExamData] = useState<Partial<Exam>>({});
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchExamDetails();
-  }, []);
+    const fetchExam = async () => {
+      const fetchExam = async () => {
+        try {
+          const response = await getExamById(Number(id)); // AxiosResponse<Exam>
+          setExamData(response.data); // ✅ Extracting the actual exam object
+        } catch (err) {
+          setError("Failed to fetch exam details.");
+        }
+      };
+      fetchExam();
+    };
+    fetchExam();      
+  }, [id]);
 
-  const fetchExamDetails = async () => {
-    try {
-      const response = await getExamById(Number(examId));
-      setExam(response.data);
-      setQuestions(response.data.questions);
-    } catch (err) {
-      setError("Failed to load exam.");
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setExamData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddQuestion = async () => {
-    if (!newQuestion.question_text || !newQuestion.correct_answer || newQuestion.options.some(opt => !opt)) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!examData.title || !examData.duration || !examData.type || !examData.pass_marks) {
       setError("All fields are required.");
       return;
     }
-
     try {
-      const response = await addQuestionToExam(Number(examId), newQuestion);
-      setQuestions([...questions, response.data]);
-      setNewQuestion({ question_text: "", options: ["", "", "", ""], correct_answer: "" });
+      await updateExam(Number(id)!, { ...examData, created_by: userId ?? 0 });
+      navigate("/admin/dashboard");
     } catch (err) {
-      setError("Failed to add question.");
-    }
-  };
-
-  const handleDeleteQuestion = async (id: number) => {
-    try {
-      await deleteQuestion(id);
-      setQuestions(questions.filter((q) => q.id !== id));
-    } catch (err) {
-      setError("Failed to delete question.");
+      setError("Failed to update exam. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Edit Exam: {exam?.title}</h2>
-      {error && <p className="error">{error}</p>}
-
-      <h3>Questions</h3>
-      <ul>
-        {questions.map((q) => (
-          <li key={q.id}>
-            {q.question_text} 
-            <button onClick={() => handleDeleteQuestion(q.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-
-      <h3>Add New Question</h3>
-      <input 
-        type="text" 
-        placeholder="Question Text" 
-        value={newQuestion.question_text} 
-        onChange={(e) => setNewQuestion({ ...newQuestion, question_text: e.target.value })} 
-      />
-      {newQuestion.options.map((opt, index) => (
-        <input 
-          key={index} 
-          type="text" 
-          placeholder={`Option ${index + 1}`} 
-          value={opt} 
-          onChange={(e) => {
-            const updatedOptions = [...newQuestion.options];
-            updatedOptions[index] = e.target.value;
-            setNewQuestion({ ...newQuestion, options: updatedOptions });
-          }} 
-        />
-      ))}
-      <input 
-        type="text" 
-        placeholder="Correct Answer" 
-        value={newQuestion.correct_answer} 
-        onChange={(e) => setNewQuestion({ ...newQuestion, correct_answer: e.target.value })} 
-      />
-      <button onClick={handleAddQuestion}>Add Question</button>
-
-      <button onClick={() => navigate("/dashboard")}>Finish</button>
+    <div className="container mt-4">
+      <h2 className="mb-3">Update Exam</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <form onSubmit={handleSubmit} className="card p-4 shadow">
+        <div className="mb-3">
+          <label className="form-label">Exam Title</label>
+          <input
+            type="text"
+            name="title"
+            className="form-control"
+            value={examData.title || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Description</label>
+          <textarea
+            name="description"
+            className="form-control"
+            rows={3}
+            value={examData.description || ""}
+            onChange={handleChange}
+          ></textarea>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Duration (minutes)</label>
+          <input
+            type="number"
+            name="duration"
+            className="form-control"
+            value={examData.duration || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Exam Type</label>
+          <select
+            name="type"
+            className="form-select"
+            value={examData.type || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="aptitude">Aptitude</option>
+            <option value="coding">Coding</option>
+          </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Pass Marks</label>
+          <input
+            type="number"
+            name="pass_marks"
+            className="form-control"
+            value={examData.pass_marks || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary w-100">Update Exam</button>
+      </form>
     </div>
   );
 };
 
-export default EditExam;
+export default UpdateExam;

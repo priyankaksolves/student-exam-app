@@ -84,7 +84,6 @@ export const createExam = async (examData: Partial<Exam>) => {
 
 export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exams/${id}`, updatedExam);
 export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exam/${id}`);
-export const deleteStudentExam = async (id: number) => axios.delete(`${API_URL}/student-exam/${id}`);
 
 // **Aptitude Test APIs**
 
@@ -224,6 +223,38 @@ export const getResult = async (studentExamId: number) => {
 };
 export const updateExamStatus = async (examId: number, isLive: boolean) => {
   return axios.patch(`${API_URL}/exam/${examId}/live`, { is_live: isLive });
+};
+
+export const fetchStudents = async () => {
+  return axios.get<{ users: { user_id: number; first_name: string; email: string }[] }>(
+    `${API_URL}/users?role=student`
+  );
+};
+
+export const fetchExams = async () => {
+  return axios.get<{ exams: { exam_id: number; title: string }[] }>(
+    `${API_URL}/exam`
+  );
+};
+
+export const fetchStudentExams = async () => {
+  return axios.get<{ studentExams: any[] }>(`${API_URL}/student-exam`);
+};
+
+export const assignStudentExam = async (
+  student_id: number,
+  exam_id: number,
+  start_time: string
+) => {
+  return axios.post(`${API_URL}/student-exam`, {
+    student_id,
+    exam_id,
+    start_time,
+  });
+};
+
+export const deleteStudentExam = async (studentExamId: number) => {
+  return axios.delete(`${API_URL}/student-exam/${studentExamId}`);
 };
 
 export default api;
