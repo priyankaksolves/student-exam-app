@@ -3,47 +3,60 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getExamById, updateExam } from "../api";
 import { useAuth } from "../authContext/AuthContext";
 import { Exam } from "../interfaces/exam";
+import { toast } from "react-toastify";
 
 const UpdateExam: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { userId } = useAuth();
-  const [examData, setExamData] = useState<Partial<Exam>>({});
+  const [examData, setExamData] = useState<Partial<Exam>>({
+    type: "aptitude",  // Default type
+  });  
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchExam = async () => {
-      const fetchExam = async () => {
-        try {
-          const response = await getExamById(Number(id)); // AxiosResponse<Exam>
-          setExamData(response.data); // ✅ Extracting the actual exam object
-        } catch (err) {
-          setError("Failed to fetch exam details.");
-        }
-      };
-      fetchExam();
+      try {
+        const response = await getExamById(Number(id)); // Fetch the exam by ID
+        console.log("Fetched Exam Data:", response.data.examDetails); // Debugging line
+        setExamData({ ...response.data.examDetails }); // Force updating state
+      } catch (err) {
+        setError("Failed to fetch exam details.");
+      }
     };
-    fetchExam();      
+    if (id) fetchExam();
   }, [id]);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    console.log(`Updating field ${name} with value:`, value);
     setExamData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Ensure all fields are populated
     if (!examData.title || !examData.duration || !examData.type || !examData.pass_marks) {
       setError("All fields are required.");
       return;
     }
+
+    if (!examData.title) {
+      return <div>Loading Exam Details...</div>;
+    }
+  
     try {
-      await updateExam(Number(id)!, { ...examData, created_by: userId ?? 0 });
+      await updateExam(Number(id), {...examData, created_by: userId ?? 0 });
+      setExamData({ ...examData, created_by: userId ?? 0 });
+      toast.success("Exam updated successfully!");
       navigate("/admin/dashboard");
     } catch (err) {
       setError("Failed to update exam. Please try again.");
     }
   };
+  
 
   return (
     <div className="container mt-4">
@@ -56,7 +69,7 @@ const UpdateExam: React.FC = () => {
             type="text"
             name="title"
             className="form-control"
-            value={examData.title || ""}
+            value={examData.title ?? ""}
             onChange={handleChange}
             required
           />
@@ -67,7 +80,7 @@ const UpdateExam: React.FC = () => {
             name="description"
             className="form-control"
             rows={3}
-            value={examData.description || ""}
+            value={examData.description ?? ""}
             onChange={handleChange}
           ></textarea>
         </div>
@@ -77,7 +90,7 @@ const UpdateExam: React.FC = () => {
             type="number"
             name="duration"
             className="form-control"
-            value={examData.duration || ""}
+            value={examData.duration ?? ""}
             onChange={handleChange}
             required
           />
@@ -87,7 +100,7 @@ const UpdateExam: React.FC = () => {
           <select
             name="type"
             className="form-select"
-            value={examData.type || ""}
+            value={examData.type ?? "aptitude"}
             onChange={handleChange}
             required
           >
@@ -101,7 +114,7 @@ const UpdateExam: React.FC = () => {
             type="number"
             name="pass_marks"
             className="form-control"
-            value={examData.pass_marks || ""}
+            value={examData.pass_marks ?? ""}
             onChange={handleChange}
             required
           />

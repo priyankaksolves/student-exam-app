@@ -14,26 +14,29 @@ const api = axios.create({
 
 // User Authentication APIs
 export const loginUser = async (email: string, password: string) => {
-
-  const response = await axios.post(`${API_URL}/users/login`, 
-    { email, password }
-  );
+  const response = await axios.post(`${API_URL}/users/login`, {
+    email,
+    password,
+  });
 
   return response.data;
 };
 
-
-export const registerUser = async (userData: { firstName: string; lastName: string; email: string; password: string; role: string }) => {
+export const registerUser = async (userData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: string;
+}) => {
   try {
-    const response = await axios.post(`${API_URL}/users/signup`, 
-      {
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        email: userData.email,
-        password: userData.password,
-        role: userData.role,
-      }
-    );
+    const response = await axios.post(`${API_URL}/users/signup`, {
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      email: userData.email,
+      password: userData.password,
+      role: userData.role,
+    });
 
     return response.data;
   } catch (error) {
@@ -41,7 +44,6 @@ export const registerUser = async (userData: { firstName: string; lastName: stri
     throw error;
   }
 };
-
 
 // Get User Profile (Protected Route)
 export const getUserProfile = async (token: string) => {
@@ -81,9 +83,11 @@ export const createExam = async (examData: Partial<Exam>) => {
   return axios.post(`${API_URL}/exam/`, formattedExamData);
 };
 
-
-export const updateExam = async (id: number, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exams/${id}`, updatedExam);
-export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exam/${id}`);
+export const updateExam = async (id: number, updatedExam: Partial<Exam>) => {
+  axios.put(`${API_URL}/exam/${id}`, updatedExam);
+};
+export const deleteExam = async (id: number) =>
+  axios.delete(`${API_URL}/exam/${id}`);
 
 // **Aptitude Test APIs**
 
@@ -92,14 +96,17 @@ export const getAllQuestions = async () => {
   return api.get(`/questions/allquestions`);
 };
 
-
 // Get all questions for an exam
 export const getExamQuestions = async (examId: number) => {
   return api.get(`/exams/${examId}/questions`);
 };
 
 // Submit answers for an exam
-export const submitExamAnswers = async (userId: number, examId: number, answers: { questionId: number; selectedOption: string }[]) => {
+export const submitExamAnswers = async (
+  userId: number,
+  examId: number,
+  answers: { questionId: number; selectedOption: string }[]
+) => {
   return api.post(`/exams/${examId}/submit`, { userId, answers });
 };
 
@@ -114,12 +121,26 @@ export const getQuestionsByExamId = async (examId: number) => {
 };
 
 // **NEW: Add a question to an exam**
-export const addQuestionToExam = async (examId: number, questionData: { question_text: string; options: string[]; correct_answer: string }) => {
+export const addQuestionToExam = async (
+  examId: number,
+  questionData: {
+    question_text: string;
+    options: string[];
+    correct_answer: string;
+  }
+) => {
   return api.post(`/exams/${examId}/questions`, questionData);
 };
 
 // **NEW: Update an existing question**
-export const updateQuestion = async (questionId: number, questionData: { question_text: string; options: string[]; correct_answer: string }) => {
+export const updateQuestion = async (
+  questionId: number,
+  questionData: {
+    question_text: string;
+    options: string[];
+    correct_answer: string;
+  }
+) => {
   return api.put(`/questions/${questionId}`, questionData);
 };
 
@@ -128,7 +149,7 @@ export const deleteQuestion = async (id: number) => {
     const response = await axios.delete(`${API_URL}/questions/${id}`);
     return response.data;
   } catch (error) {
-    console.error('Error deleting question:', error);
+    console.error("Error deleting question:", error);
     throw error;
   }
 };
@@ -137,17 +158,16 @@ export const addQuestion = async (examId: number, questions: Question[]) => {
   return api.post(`/exam/${examId}/question/add`, { questions });
 };
 
-
 // Fetch existing questions for an exam
 export const getQuestionsForExam = async (examId: number) => {
   return api.get(`/exam/${examId}`);
 };
 
-
 export const startExam = async (examId: number) => {
-  return api.patch(`/student-exam/${examId}/start`)
-    .then(response => response.data) // Returns { message: 'Exam Started', leftTime }
-    .catch(error => {
+  return api
+    .patch(`/student-exam/${examId}/start`)
+    .then((response) => response.data) // Returns { message: 'Exam Started', leftTime }
+    .catch((error) => {
       if (axios.isAxiosError(error) && error.response) {
         throw error.response.data;
       } else {
@@ -159,10 +179,14 @@ export const startExam = async (examId: number) => {
 // Fetch all students
 export const getAllStudents = async () => {
   try {
-    const response = await axios.post(`${API_URL}/users/getUsers`, { role: "student" });
+    const response = await axios.post(`${API_URL}/users/getUsers`, {
+      role: "student",
+    });
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to load students.");
+    throw new Error(
+      error.response?.data?.message || "Failed to load students."
+    );
   }
 };
 
@@ -180,7 +204,6 @@ export const assignExamToStudent = async (examData: {
   }
 };
 
-
 // Fetch assigned exams for a student
 export const getStudentExams = async (studentId: number) => {
   try {
@@ -194,7 +217,9 @@ export const getStudentExams = async (studentId: number) => {
 // Start an exam
 export const startStudentExam = async (studentExamId: number) => {
   try {
-    const response = await axios.patch(`${API_URL}/student-exam/${studentExamId}/start`);
+    const response = await axios.patch(
+      `${API_URL}/student-exam/${studentExamId}/start`
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to start exam.");
@@ -203,14 +228,15 @@ export const startStudentExam = async (studentExamId: number) => {
 
 // Submit Exam
 export const submitExam = async (studentExamId: number, responses: any[]) => {
-  return axios.post(`${API_URL}/student-response/${studentExamId}`, { responses });
+  return axios.post(`${API_URL}/student-response/${studentExamId}`, {
+    responses,
+  });
 };
 
 export const declareResult = async (studentExamId: number) => {
   const response = await axios.post(`${API_URL}/result/exam/${studentExamId}`);
   return response.data;
 };
-
 
 // Fetch assigned exams for a student
 export const getResult = async (studentExamId: number) => {
@@ -226,9 +252,9 @@ export const updateExamStatus = async (examId: number, isLive: boolean) => {
 };
 
 export const fetchStudents = async () => {
-  return axios.get<{ users: { user_id: number; first_name: string; email: string }[] }>(
-    `${API_URL}/users?role=student`
-  );
+  return axios.get<{
+    users: { user_id: number; first_name: string; email: string }[];
+  }>(`${API_URL}/users?role=student`);
 };
 
 export const fetchExams = async () => {
