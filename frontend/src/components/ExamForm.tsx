@@ -45,7 +45,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
   const update = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateExam(examData.created_by, examData);
+      await updateExam(examData.exam_id, examData);
       toast.success("Exam Updated successfully.");
       navigate("/admin/dashboard");
     } catch (err: any) {
@@ -65,7 +65,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
           name="title"
           className="form-control"
           placeholder="Enter exam title"
-          value={examData.title}
+          value={examData.title ?? ""}
           onChange={handleChange}
           required
         />
@@ -77,7 +77,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
           className="form-control"
           placeholder="Enter exam description"
           rows={3}
-          value={examData.description}
+          value={examData.description ?? ""}
           onChange={handleChange}
         ></textarea>
       </div>
@@ -88,7 +88,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
           <select
             name="type"
             className="form-select"
-            value={examData.type}
+            value={examData.type ?? ""}
             onChange={handleChange}
             required
           >
@@ -103,7 +103,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
             name="duration"
             className="form-control"
             placeholder="Enter duration in minutes"
-            value={examData.duration}
+            value={examData.duration ?? ""}
             onChange={handleChange}
             required
             min="1"
@@ -117,7 +117,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
             name="pass_marks"
             className="form-control"
             placeholder="Enter minimum pass marks"
-            value={examData.pass_marks}
+            value={examData.pass_marks ?? ""}
             onChange={handleChange}
             required
             min="0"
