@@ -36,10 +36,10 @@ const StudentDashboard: React.FC = () => {
     }
   };
 
-  const handleStartExam = async (examId: number, studentExamId: number) => {
+  const handleStartExam = async (studentExamId: number) => {
     try {
       await startExam(studentExamId);
-      navigate(`/exam/${examId}/${studentExamId}`);
+      navigate(`/student-exam/${studentExamId}`);
       toast.success("Exam started successfully!", { autoClose: 3000 });
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
@@ -89,7 +89,7 @@ const StudentDashboard: React.FC = () => {
                   {exam.status === "not_started" && (
                     <Button
                       onClick={() =>
-                        handleStartExam(exam.exam_id, exam.student_exam_id)
+                        handleStartExam(exam.student_exam_id)
                       }
                     >
                       Start Exam

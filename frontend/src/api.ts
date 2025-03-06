@@ -65,6 +65,7 @@ export const logoutUser = () => {
 
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exam/${id}`);
+export const getStudentExamById = async (id: number) => api.get(`/student-exam/${id}`);
 
 export const getAllExams = async () => {
   const response = await axios.get(`${API_URL}/exam`);
@@ -197,7 +198,7 @@ export const assignExamToStudent = async (examData: {
 // Fetch assigned exams for a student
 export const getStudentExams = async (studentId: number) => {
   try {
-    const response = await axios.get(`${API_URL}/student-exam/${studentId}`);
+    const response = await axios.get(`${API_URL}/student-exam/${studentId}/all`);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch exams.");
