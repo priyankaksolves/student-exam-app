@@ -273,3 +273,18 @@ export const deleteStudentExam = async (studentExamId: number) => {
 };
 
 export default api;
+
+
+export const updateStudentExam = async (studentExamData: {
+  student_id: number;
+  start_time: string;
+  exam_id: number;
+  student_exam_id: number;
+}) => {
+  try {
+    const response = await axios.put(`${API_URL}/student-exam`, studentExamData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to update student exam.");
+  }
+};

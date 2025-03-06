@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Select from "react-select";
 import { Table, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { deleteStudentExam } from "../api";
+import {
+  fetchStudents,
+  fetchExams,
+  fetchStudentExams,
+  assignStudentExam,
+  deleteStudentExam,
+} from "../api"; // Ensure these API functions are properly defined in your API file.
 import "../styles/AdminDashboard.css";
 
 interface Student {
@@ -25,15 +30,8 @@ interface Option {
 
 interface StudentExamRecord {
   student_exam_id: number;
-  student: {
-    user_id: number;
-    first_name: string;
-    email: string;
-  };
-  exam: {
-    exam_id: number;
-    title: string;
-  };
+  student: Student;
+  exam: Exam;
   start_time: string;
   end_time: string;
   status: string;
@@ -41,52 +39,48 @@ interface StudentExamRecord {
 
 const StudentExam: React.FC = () => {
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState<Student[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Option | null>(null);
   const [selectedExam, setSelectedExam] = useState<Option | null>(null);
-  const [startTime, setStartTime] = useState<string>("");
+  const [startTime, setStartTime] = useState("");
   const [studentExams, setStudentExams] = useState<StudentExamRecord[]>([]);
 
   useEffect(() => {
-    fetchStudents();
-    fetchExams();
-    fetchStudentExams();
+    loadStudents();
+    loadExams();
+    loadStudentExams();
   }, []);
 
-  const fetchStudents = async (): Promise<void> => {
+  const loadStudents = async () => {
     try {
-      const response = await axios.get<{ users: Student[] }>(
-        "http://localhost:5000/api/users?role=student"
-      );
+      const response = await fetchStudents();
       setStudents(response.data.users);
     } catch (error) {
       console.error("Error fetching students", error);
     }
   };
 
-  const fetchExams = async (): Promise<void> => {
+  const loadExams = async () => {
     try {
-      const response = await axios.get<{ exams: Exam[] }>(
-        "http://localhost:5000/api/exam"
-      );
-      setExams(response.data.exams);
+      const response = await fetchExams();
+      setExams(response.data.exams || []);
     } catch (error) {
       console.error("Error fetching exams", error);
     }
   };
 
-  const fetchStudentExams = async (): Promise<void> => {
+  const loadStudentExams = async () => {
     try {
-      const response = await axios.get<{ studentExams: StudentExamRecord[] }>(
-        "http://localhost:5000/api/student-exam"
-      );
+      setLoading(true);
+      const response = await fetchStudentExams();
       setStudentExams(response.data.studentExams);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching student exams", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,12 +90,12 @@ const StudentExam: React.FC = () => {
     setStartTime("");
   };
 
-  const handleAssignExam = (): void => {
+  const handleAssignExam = () => {
     resetForm();
     setShowForm(true);
   };
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async () => {
     if (!selectedStudent || !selectedExam || !startTime) {
       toast.error("Please select a student, an exam, and a start time.", {
         autoClose: 5000,
@@ -110,44 +104,37 @@ const StudentExam: React.FC = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/student-exam", {
-        student_id: selectedStudent.value,
-        exam_id: selectedExam.value,
-        start_time: startTime,
-      });
+      await assignStudentExam(
+        selectedStudent.value,
+        selectedExam.value,
+        startTime,
+      );
+
       toast.success("Student exam assigned successfully");
       setShowForm(false);
       resetForm();
-      fetchStudentExams();
+      loadStudentExams();
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message || "Error creating student exam",
-        {
-          autoClose: 5000,
-        }
+        error.response?.data?.message || "Error assigning student exam",
+        { autoClose: 5000 }
       );
     }
   };
 
-  const handleDelete = async (studentexamId: number) => {
+  const handleDelete = async (studentExamId: number) => {
     try {
-      const response = await deleteStudentExam(studentexamId);
-      toast.success(response.data.message, { autoClose: 5000 });
-      setStudentExams(
-        studentExams.filter((exam) => exam.student_exam_id !== studentexamId)
-      );
+      await deleteStudentExam(studentExamId);
+      toast.success("Exam deleted successfully", { autoClose: 5000 });
+      setStudentExams(studentExams.filter((exam) => exam.student_exam_id !== studentExamId));
     } catch (error: any) {
       toast.error(
-        error.response?.data?.message ||
-          "Failed to delete exam. Please try again.",
-        {
-          autoClose: 5000,
-        }
+        error.response?.data?.message || "Failed to delete exam. Please try again.",
+        { autoClose: 5000 }
       );
     }
   };
 
-  // Convert students and exams to react-select option format
   const studentOptions: Option[] = students.map((student) => ({
     value: student.user_id,
     label: `${student.first_name} (${student.email})`,
@@ -160,13 +147,10 @@ const StudentExam: React.FC = () => {
 
   return (
     <div className="mt-5">
-      <button
-        className="btn btn-primary rounded-pill btn-sm"
-        onClick={handleAssignExam}
-      >
+      <button className="btn btn-primary rounded-pill btn-sm" onClick={handleAssignExam}>
         Assign Exam
       </button>
-      <br />
+
       {loading && <Spinner className="mt-2" animation="border" role="status" />}
 
       {showForm && (
@@ -177,10 +161,7 @@ const StudentExam: React.FC = () => {
               <Select
                 options={studentOptions}
                 value={selectedStudent}
-                onChange={(option) => {
-                  console.log("Selected student option:", option);
-                  setSelectedStudent(option);
-                }}
+                onChange={setSelectedStudent}
                 placeholder="Select Student..."
                 isClearable
               />
@@ -190,10 +171,7 @@ const StudentExam: React.FC = () => {
               <Select
                 options={examOptions}
                 value={selectedExam}
-                onChange={(option) => {
-                  console.log("Selected exam option:", option);
-                  setSelectedExam(option);
-                }}
+                onChange={setSelectedExam}
                 placeholder="Select Exam..."
                 isClearable
               />
@@ -209,24 +187,16 @@ const StudentExam: React.FC = () => {
             </div>
           </div>
           <div className="d-flex mt-2">
-            <button
-              className="btn btn-success btn-sm me-2"
-              onClick={handleSubmit}
-            >
+            <button className="btn btn-success btn-sm me-2" onClick={handleSubmit}>
               Create
             </button>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => {
-                setShowForm(false);
-                resetForm();
-              }}
-            >
+            <button className="btn btn-secondary btn-sm" onClick={() => setShowForm(false)}>
               Cancel
             </button>
           </div>
         </div>
       )}
+
       {studentExams.length > 0 && (
         <Table striped bordered hover responsive className="mt-3">
           <thead>
@@ -247,36 +217,15 @@ const StudentExam: React.FC = () => {
                 <td>{record.exam.title}</td>
                 <td>{record.student.first_name}</td>
                 <td>{record.status.replace("_", " ")}</td>
-                <td>
-                  {new Date(record.start_time).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </td>
-                <td>
-                  {new Date(record.start_time).toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
-                </td>
+                <td>{new Date(record.start_time).toLocaleDateString()}</td>
+                <td>{new Date(record.start_time).toLocaleTimeString()}</td>
                 <td className="d-flex align-items-center">
-                  <div
-                    className="d-flex align-items-center edit-button me-1"
-                    onClick={() => navigate(`/`)}
-                  >
-                    <i className="bi bi-pencil-square me-1"></i>
-                    <span> Edit</span>
-                  </div>
-                  <div
-                    className="d-flex align-items-center delete-button me-1"
-                    onClick={() => handleDelete(record.student_exam_id)}
-                  >
-                    <i className="bi bi-trash-fill me-1"></i>
-                    <span> Delete</span>
-                  </div>
+                  <span className="edit-button me-1" onClick={() => navigate(`/edit/${record.student_exam_id}`)}>
+                    ✏️ Edit
+                  </span>
+                  <span className="delete-button me-1" onClick={() => handleDelete(record.student_exam_id)}>
+                    🗑️ Delete
+                  </span>
                 </td>
               </tr>
             ))}
