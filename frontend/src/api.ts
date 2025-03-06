@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Question } from "./interfaces/Question";
 import { Exam } from "./interfaces/exam";
+import { User } from "./interfaces/User";
 
 const API_URL = "http://localhost:5000/api"; // Base API URL
 
@@ -241,15 +242,24 @@ export const updateExamStatus = async (examId: number, isLive: boolean) => {
 };
 
 export const fetchStudents = async () => {
-  return axios.get<{
-    users: { user_id: number; first_name: string; email: string }[];
-  }>(`${API_URL}/users?role=student`);
+  try {
+    const response = await axios.get<{ users: User[] }>(`${API_URL}/users?role=student`);
+    return response.data.users; // Extract only the users array
+  } catch (error) {
+    console.error("Error fetching students", error);
+    throw error;
+  }
 };
 
+
 export const fetchExams = async () => {
-  return axios.get<{ exams: { exam_id: number; title: string }[] }>(
-    `${API_URL}/exam`
-  );
+  try {
+    const response = await axios.get<{ exams: Exam[] }>(`${API_URL}/exam`);
+    return response.data.exams; // Extract exams array
+  } catch (error) {
+    console.error("Error fetching exams", error);
+    throw error;
+  }
 };
 
 export const fetchStudentExams = async () => {
@@ -282,7 +292,7 @@ export const updateStudentExam = async (studentExamData: {
   student_exam_id: number;
 }) => {
   try {
-    const response = await axios.put(`${API_URL}/student-exam`, studentExamData);
+    const response = await axios.put(`${API_URL}/student-exam/${studentExamData.exam_id}`, studentExamData);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to update student exam.");

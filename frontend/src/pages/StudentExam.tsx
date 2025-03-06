@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { Table, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchStudents,
   fetchExams,
@@ -47,6 +47,7 @@ const StudentExam: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<Option | null>(null);
   const [startTime, setStartTime] = useState("");
   const [studentExams, setStudentExams] = useState<StudentExamRecord[]>([]);
+  const { id } = useParams()
 
   useEffect(() => {
     loadStudents();
@@ -57,7 +58,7 @@ const StudentExam: React.FC = () => {
   const loadStudents = async () => {
     try {
       const response = await fetchStudents();
-      setStudents(response.data.users);
+      setStudents(response);
     } catch (error) {
       console.error("Error fetching students", error);
     }
@@ -66,7 +67,7 @@ const StudentExam: React.FC = () => {
   const loadExams = async () => {
     try {
       const response = await fetchExams();
-      setExams(response.data.exams || []);
+      setExams(response || []);
     } catch (error) {
       console.error("Error fetching exams", error);
     }
@@ -121,6 +122,12 @@ const StudentExam: React.FC = () => {
       );
     }
   };
+
+  const handleEdit= async (student_exam_id: number, record: StudentExamRecord)=> {
+    navigate(`/edit/${student_exam_id}`, { state: { record } });
+
+  };
+
 
   const handleDelete = async (studentExamId: number) => {
     try {
@@ -220,7 +227,7 @@ const StudentExam: React.FC = () => {
                 <td>{new Date(record.start_time).toLocaleDateString()}</td>
                 <td>{new Date(record.start_time).toLocaleTimeString()}</td>
                 <td className="d-flex align-items-center">
-                  <span className="edit-button me-1" onClick={() => navigate(`/edit/${record.student_exam_id}`)}>
+                  <span className="edit-button me-1" onClick={() => handleEdit(record.student_exam_id, record)}>
                     ✏️ Edit
                   </span>
                   <span className="delete-button me-1" onClick={() => handleDelete(record.student_exam_id)}>
