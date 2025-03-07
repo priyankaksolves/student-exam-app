@@ -293,7 +293,7 @@ export const updateStudentExam = async (studentExamData: {
   student_exam_id: number;
 }) => {
   try {
-    const response = await axios.put(`${API_URL}/student-exam/${studentExamData.exam_id}`, studentExamData);
+    const response = await axios.put(`${API_URL}/student-exam/${studentExamData.student_exam_id}`, studentExamData);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to update student exam.");
