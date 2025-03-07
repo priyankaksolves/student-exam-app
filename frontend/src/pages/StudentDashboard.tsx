@@ -40,7 +40,6 @@ const StudentDashboard: React.FC = () => {
     try {
       await startExam(studentExamId);
       navigate(`/student-exam/${studentExamId}`);
-      toast.success("Exam started successfully!", { autoClose: 3000 });
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }

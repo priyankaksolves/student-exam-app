@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Button, Spinner, Alert, Form } from "react-bootstrap";
+import { Container, Button, Spinner, Form } from "react-bootstrap";
 import { declareResult, getStudentExamById, submitExam } from "../api";
 import { toast } from "react-toastify";
 import { Exam } from "../interfaces/exam";
@@ -12,7 +12,6 @@ const ExamPage: React.FC = () => {
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [responses, setResponses] = useState<{
     [key: number]: number | number[] | boolean | null;
   }>({});
@@ -35,8 +34,9 @@ const ExamPage: React.FC = () => {
           }
         });
         setResponses(initialResponses);
-      } catch (err: any) {
-        setError("Failed to load exam details.");
+        toast.success("Exam started successfully!", { autoClose: 3000 });
+      } catch (error: any) {
+        toast.error(error.response?.data?.message);
       } finally {
         setLoading(false);
       }
@@ -119,7 +119,6 @@ const ExamPage: React.FC = () => {
   };
 
   if (loading) return <Spinner animation="border" />;
-  if (error) return <Alert variant="danger">{error}</Alert>;
   if (!exam) return <p>No exam found!</p>;
 
   return (

@@ -65,7 +65,14 @@ export const logoutUser = () => {
 
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exam/${id}`);
-export const getStudentExamById = async (id: number) => api.get(`/student-exam/${id}`);
+export const getStudentExamById = async (id: number) => {
+  const token = localStorage.getItem("token");
+  return api.get(`/student-exam/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 export const getAllExams = async () => {
   const response = await axios.get(`${API_URL}/exam`);
