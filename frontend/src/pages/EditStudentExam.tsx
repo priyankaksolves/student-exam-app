@@ -9,7 +9,7 @@ import { Exam } from "../interfaces/exam";
 const EditStudentExam: React.FC = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { student_exam_id } = useParams<{ student_exam_id: string }>();
+  const { studentExamId } = useParams();
   const [students, setStudents] = useState<User[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<{
@@ -64,7 +64,7 @@ const EditStudentExam: React.FC = () => {
 
     try {
       await updateStudentExam({
-        student_exam_id: Number(student_exam_id),
+        student_exam_id: Number(studentExamId),
         student_id: selectedStudent.value,
         exam_id: selectedExam.value,
         start_time: startTime,
