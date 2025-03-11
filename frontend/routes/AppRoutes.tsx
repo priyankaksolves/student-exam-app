@@ -18,6 +18,7 @@ import ResultPage from "../src/pages/ResultPage";
 import AdminDashboard from "../src/pages/AdminDashboard";
 import AddQuestions from "../src/pages/AddQuestions";
 import EditStudentExam from "../src/pages/EditStudentExam";
+import ExamDetails from "../src/pages/ExamDetails";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -57,6 +58,8 @@ const AppRoutes: React.FC = () => {
           <Route path="/student-exam/:studentExamId" element={<ProtectedRoute accessRole="student"><ExamPage /></ProtectedRoute>} />
           <Route path="/result/:studentExamId" element={<ProtectedRoute accessRole="student"><ResultPage /></ProtectedRoute>} />
           <Route path="/edit/:studentExamId" element={<ProtectedRoute accessRole="admin"><EditStudentExam /></ProtectedRoute>} />
+          <Route path="/exam/:id" element={<ProtectedRoute accessRole="admin"><ExamDetails /></ProtectedRoute>} /> 
+
         </Routes>
       </div>
     </Router>

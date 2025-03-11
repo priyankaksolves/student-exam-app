@@ -32,7 +32,6 @@ const AddQuestions: React.FC = () => {
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       <QuestionForm examID={Number(examId)} />
-      <ExistingQuestions questions={questions} />
     </Container>
   );
 };

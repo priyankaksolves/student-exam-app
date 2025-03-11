@@ -36,3 +36,14 @@
   background-color: white;
   color: green;
 }
+
+.exam-title-link {
+  color: #007bff;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.exam-title-link:hover {
+  color: #0056b3;
+}

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
 import "../styles/AdminDashboard.css";
 
@@ -11,7 +12,11 @@ interface ExamRowProps {
 
 export const ExamRow: React.FC<ExamRowProps> = ({ exam, onDelete, onToggleLiveStatus, navigate }) => (
   <tr>
-    <td>{exam.title}</td>
+    <td>
+    <Link to={`/exam/${exam.exam_id}`} className="exam-title-link">
+        {exam.title}
+      </Link>
+    </td>
     <td>{exam.type}</td>
     <td>{exam.pass_marks}</td>
     <td>{exam.duration}</td>

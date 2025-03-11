@@ -12,3 +12,5 @@ export interface Exam {
   is_live: boolean;
   questions: Question[];
 }
+
+export { Question };
