@@ -4,8 +4,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
 import { Button } from "react-bootstrap";
 import QuestionForm from "../components/QuestionForm";
+import ImportQuestions from "./ImportQuestions";
 import { Question } from "../interfaces/Question";
 import { toast } from "react-toastify";
+import { handleParse } from "../helper/ParseQuestion";
 
 interface CreateExamProps {
   examData: Partial<Exam>;
@@ -17,6 +19,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
   const navigate = useNavigate();
   const [addQuestion, setAddQuestion] = useState<boolean>(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [file, setFile] = useState<File | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -30,13 +33,22 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload = { ...examData, questions };
+      let parsedQuestions: Question[] = [];
+  
+      if (file !== null) {
+        parsedQuestions = await handleParse(file, examData.exam_id ?? 0);
+      }
+      const payload: Partial<Exam> = { 
+        ...examData, 
+        questions: parsedQuestions.length > 0 ? parsedQuestions : questions
+      };
+  
       await createExam(payload);
       toast.success("Exam created successfully.");
       navigate("/admin/dashboard");
     } catch (err: any) {
       toast.error(
-        err.response?.data?.message ||
+        err.response?.data?.message || err.message ||
           "Failed to create exam. Please try again."
       );
     }
@@ -136,19 +148,24 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
         <QuestionForm examID={0} onQuestionsChange={setQuestions} />
       )}
       {!id && (
-        <Button
-          variant={addQuestion ? "danger" : "success"}
-          size="sm"
-          className="mt-3"
-          onClick={() => {
-            if (addQuestion) {
-              setQuestions([]);
-            }
-            setAddQuestion(!addQuestion);
-          }}
-        >
-          {addQuestion ? "- Remove Questions" : "+ Add Questions"}
-        </Button>
+        <div className="d-flex">
+          {file === null && (
+            <Button
+              variant={addQuestion ? "danger" : "success"}
+              size="sm"
+              className="mt-3 me-3"
+              onClick={() => {
+                if (addQuestion) {
+                  setQuestions([]);
+                }
+                setAddQuestion(!addQuestion);
+              }}
+            >
+              {addQuestion ? "- Remove Questions" : "+ Add Questions"}
+            </Button>
+          )}
+          {!addQuestion && <ImportQuestions setFile={setFile} />}
+        </div>
       )}
 
       <button className="btn btn-primary w-100 mt-4">
