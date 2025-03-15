@@ -106,7 +106,7 @@ const parseQuestion = (q: any, exam_id: number, index: number): Question | null 
     return null;
   }
 
-  let options: { question_id: number; option_text: string; is_correct: boolean }[] = [];
+  let options: {option_id: number; question_id: number; option_text: string; is_correct: boolean }[] = [];
   let correctAnswer: boolean | null = null;
 
   if (questionType === "true_false") {
@@ -120,6 +120,7 @@ const parseQuestion = (q: any, exam_id: number, index: number): Question | null 
     q.options.forEach((option: any) => {
       if (option.text) {
         options.push({
+          option_id: 0,
           question_id: 0,
           option_text: option.text,
           is_correct: option.is_correct,

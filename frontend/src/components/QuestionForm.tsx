@@ -20,10 +20,11 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
       exam_id: examID,
       question_text: "",
       question_type: "multiple_choice",
+      question_id: 0,
       marks: 1,
       options: [
-        { question_id: 0, option_text: "", is_correct: false },
-        { question_id: 0, option_text: "", is_correct: false },
+        { option_id: 0, question_id: 0, option_text: "", is_correct: false },
+        { option_id: 0, question_id: 0, option_text: "", is_correct: false },
       ],
       correct_answer: undefined,
     },
@@ -47,8 +48,8 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
                   ? value === "true_false"
                     ? []
                     : [
-                        { question_id: 0, option_text: "", is_correct: false },
-                        { question_id: 0, option_text: "", is_correct: false },
+                      { option_id: 0, question_id: 0, option_text: "", is_correct: false },
+                      { option_id: 0, question_id: 0, option_text: "", is_correct: false },
                       ]
                   : q.options,
               correct_answer:
@@ -108,6 +109,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
       }
 
       updatedQuestions[qIndex].options.push({
+        option_id: 0,
         question_id: 0,
         option_text: "",
         is_correct: false,
@@ -125,9 +127,10 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
         question_text: "",
         question_type: "multiple_choice",
         marks: 1,
+        question_id: 0,
         options: [
-          { question_id: 0, option_text: "", is_correct: false },
-          { question_id: 0, option_text: "", is_correct: false },
+          { option_id: 0, question_id: 0, option_text: "", is_correct: false },
+          { option_id: 0, question_id: 0, option_text: "", is_correct: false },
         ],
         correct_answer: undefined,
       },

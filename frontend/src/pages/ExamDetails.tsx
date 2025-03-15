@@ -35,36 +35,51 @@ const ExamDetails: React.FC = () => {
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!exam) return <Alert variant="warning">Exam not found.</Alert>;
 
-  return (
-    <Container className="exam-details-container">
-      <Card className="exam-details-card">
-        <Card.Header className="text-center text-white bg-primary">
-          <h4>{exam.title}</h4>
-        </Card.Header>
-        <Card.Body>
-          <p><strong>Type:</strong> {exam.type}</p>
-          <p><strong>Pass Marks:</strong> {exam.pass_marks}</p>
-          <p><strong>Duration:</strong> {exam.duration} minutes</p>
-          <p>
-            <strong>Status:</strong> 
-            <span className={`status-badge ${exam.is_live ? "active" : "inactive"}`}>
-              {exam.is_live ? "Active" : "Inactive"}
-            </span>
-          </p>
-        </Card.Body>
 
-        <Card.Footer className="text-center">
-          <Button variant="primary" onClick={() => window.history.back()}>
-            Go Back
-          </Button>
-        </Card.Footer>
-      </Card>
+  const handleEditQuestion = (questionId: number, updatedQuestion: Question) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q) => (q.question_id === questionId ? updatedQuestion : q))
+    );
+  };
+  
+  const handleDeleteQuestion = (questionId: number) => {
+    setQuestions((prevQuestions) => prevQuestions.filter((q) => q.question_id !== questionId));
+  };
 
-      <div className="mt-4">
-        <ExistingQuestions questions={questions} /> 
-      </div>
-    </Container>
-  );
+ 
+return (
+  <Container className="exam-details-container">
+    <Card className="exam-details-card">
+      <Card.Header className="text-center text-white bg-primary">
+        <h4>{exam.title}</h4>
+      </Card.Header>
+      <Card.Body>
+        <p><strong>Type:</strong> {exam.type}</p>
+        <p><strong>Pass Marks:</strong> {exam.pass_marks}</p>
+        <p><strong>Duration:</strong> {exam.duration} minutes</p>
+        <p>
+          <strong>Status:</strong> 
+          <span className={`status-badge ${exam.is_live ? "active" : "inactive"}`} style={{marginLeft: '10px'}}>
+            {exam.is_live ? "Active" : "Inactive"}
+          </span>
+        </p>
+      </Card.Body>
+      <Card.Footer className="text-center">
+        <Button variant="primary" onClick={() => window.history.back()}>
+          Go Back
+        </Button>
+      </Card.Footer>
+    </Card>
+
+    <div className="mt-4">
+      <ExistingQuestions 
+        questions={questions} 
+        onEdit={handleEditQuestion} 
+        onDelete={handleDeleteQuestion} 
+      />
+    </div>
+  </Container>
+);
 };
 
 export default ExamDetails;

@@ -132,14 +132,16 @@ export const addQuestionToExam = async (
 
 // **NEW: Update an existing question**
 export const updateQuestion = async (
-  questionId: number,
+  exam_id: number,
+  question_id: number,
   questionData: {
     question_text: string;
     options: string[];
     correct_answer: string;
+    question_type: string;
   }
 ) => {
-  return api.put(`/questions/${questionId}`, questionData);
+  return api.put(`exam/${exam_id}/question/edit/${question_id}`, questionData);
 };
 
 export const deleteQuestion = async (id: number) => {
@@ -290,9 +292,6 @@ export const deleteStudentExam = async (studentExamId: number) => {
   return axios.delete(`${API_URL}/student-exam/${studentExamId}`);
 };
 
-export default api;
-
-
 export const updateStudentExam = async (studentExamData: {
   student_id: number;
   start_time: string;
@@ -306,3 +305,6 @@ export const updateStudentExam = async (studentExamData: {
     throw new Error(error.response?.data?.message || "Failed to update student exam.");
   }
 };
+
+
+export default api;
