@@ -27,10 +27,10 @@ export const handleParse = async (file: File | null, exam_id: number): Promise<Q
         parsed.data.forEach((q: any, index: number) => {
           let options: any[] = [];
           for (let i = 1; i <= 4; i++) {
-            if (q[`Option ${i}`]) {
+            if (q[`option_${i}`]) {
               options.push({
-                text: q[`Option ${i}`],
-                is_correct: q[`Is Correct ${i}`]?.toLowerCase() === "true",
+                text: q[`option_${i}`],
+                is_correct: q[`is_correct_${i}?`]?.toLowerCase() === "true",
               });
             }
           }
@@ -38,7 +38,7 @@ export const handleParse = async (file: File | null, exam_id: number): Promise<Q
           validateAndParse({ 
             ...q, 
             options 
-          }, index);
+          }, index + 1);
         });
 
         if (errors.length > 0) {
