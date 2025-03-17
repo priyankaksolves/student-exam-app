@@ -134,12 +134,7 @@ export const addQuestionToExam = async (
 export const updateQuestion = async (
   exam_id: number,
   question_id: number,
-  questionData: {
-    question_text: string;
-    options: string[];
-    correct_answer: string;
-    question_type: string;
-  }
+  questionData: any
 ) => {
   return api.put(`exam/${exam_id}/question/edit/${question_id}`, questionData);
 };

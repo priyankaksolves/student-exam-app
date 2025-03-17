@@ -24,12 +24,19 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
     setFormData({ ...question, options: question.options || [] });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (formData) {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    if (!formData) return;
+  
+    const { name, value, type } = e.target;
+  
+    setFormData({
+      ...formData,
+      [name]: type === "number" ? Number(value) : value, // Ensure numeric values for marks
+    });
   };
-
+  
+  
+  
   const handleOptionChange = (index: number, newText: string) => {
     if (formData) {
       const updatedOptions = (formData.options || []).map((opt, i) =>
@@ -41,44 +48,52 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
 
   const handleCorrectAnswerChange = (index: number) => {
     if (formData) {
-      if (formData.question_type === "multi_select") {
-        const updatedOptions = (formData.options || []).map((opt, i) =>
-          i === index ? { ...opt, is_correct: !opt.is_correct } : opt
-        );
-        setFormData({ ...formData, options: updatedOptions });
-      } else if (formData.question_type === "true_false") {
-        const updatedOptions = [
-          { option_text: "True",option_id:0, question_id: 0,is_correct: index === 0 },
-          { option_text: "False", option_id:0, question_id: 0, is_correct: index === 1 }
-        ];
-        setFormData({ ...formData, options: updatedOptions });
-      } else {
-        const updatedOptions = (formData.options || []).map((opt, i) => ({
+      let updatedOptions = [...(formData.options || [])];
+  
+      if (formData.question_type === "multiple_choice") {
+        // Ensure only one correct answer is selected
+        updatedOptions = updatedOptions.map((opt, i) => ({
           ...opt,
-          is_correct: i === index,
+          is_correct: i === index, // Only the selected option is correct
         }));
-        setFormData({ ...formData, options: updatedOptions });
+      } else if (formData.question_type === "multi_select") {
+        // Toggle correct status for multi-select
+        updatedOptions[index].is_correct = !updatedOptions[index].is_correct;
+      } else if (formData.question_type === "true_false") {
+        // Ensure only one is correct (True or False)
+        updatedOptions = [
+          { option_text: "True", option_id: 0, question_id:0, is_correct: index === 0 },
+          { option_text: "False", option_id: 0, question_id:0,  is_correct: index === 1 }
+        ];
       }
+  
+      setFormData({ ...formData, options: updatedOptions });
     }
   };
+  
 
   const handleSave = async () => {
-    if (editingQuestion && formData) {
+    if (formData) {
       try {
-        const transformedData = {
+        const payload = {
           question_text: formData.question_text,
-          options: (formData.options || []).map(option => option.option_text),
-          correct_answer: (formData.options || []).filter(option => option.is_correct).map(option => option.option_text).join(", "),
-          question_type:formData.question_type 
+          marks: formData.marks,
+          question_type: formData.question_type,
+          correct_answer: formData.correct_answer,
+          options: formData.options, // Ensure it's an array of objects
         };
-        const response = await updateQuestion(editingQuestion.exam_id, editingQuestion.question_id, transformedData);
-        onEdit(editingQuestion.question_id, response.data.question);
+  
+        const response = await updateQuestion(formData.exam_id, formData.question_id, payload);
+  
+        onEdit(formData.question_id, response.data.question);
         setEditingQuestion(null);
       } catch (error) {
         console.error("Error updating question:", error);
       }
     }
   };
+  
+  
 
   const handleDelete = (questionId: number) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
@@ -115,62 +130,66 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
           <Modal.Title>Edit Question</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {formData && (
-            <>
-              <Form.Group>
-                <Form.Label>Question Text</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="question_text"
-                  value={formData.question_text || ""}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-              <Form.Group className="mt-3">
-                <Form.Label>Options</Form.Label>
-                {formData.question_type === "true_false" ? (
-                  <>
-                    <Form.Check
-                      type="radio"
-                      label="True"
-                      name="trueFalseAnswer"
-                      checked={formData.options?.some(opt => opt.option_text === "True" && opt.is_correct)}
-                      onChange={() => handleCorrectAnswerChange(0)}
-                    />
-                    <Form.Check
-                      type="radio"
-                      label="False"
-                      name="trueFalseAnswer"
-                      checked={formData.options?.some(opt => opt.option_text === "False" && opt.is_correct)}
-                      onChange={() => handleCorrectAnswerChange(1)}
-                    />
-                  </>
-                ) : (
-                  (formData.options || []).map((option, index) => (
-                    <Row key={option.option_id} className="mb-2">
-                      <Col>
-                        <Form.Control
-                          type="text"
-                          value={option.option_text || ""}
-                          onChange={(e) => handleOptionChange(index, e.target.value)}
-                          disabled={formData.question_type === "true_false"}
-                        />
-                      </Col>
-                      <Col xs="auto">
-                        <Form.Check
-                          type={formData.question_type === "multi_select" ? "checkbox" : "radio"}
-                          name="correctAnswer"
-                          checked={option.is_correct}
-                          onChange={() => handleCorrectAnswerChange(index)}
-                        />
-                      </Col>
-                    </Row>
-                  ))
-                )}
-              </Form.Group>
-            </>
-          )}
-        </Modal.Body>
+  {formData && (
+    <>
+      <Form.Group>
+        <Form.Label>Question Text</Form.Label>
+        <Form.Control
+          type="text"
+          name="question_text"
+          value={formData.question_text || ""}
+          onChange={handleChange}
+        />
+      </Form.Group>
+
+      <Form.Group className="mt-3">
+        <Form.Label>Question Marks</Form.Label>
+        <Form.Control
+          type="number"
+          name="marks"
+          value={formData.marks || ""}
+          onChange={handleChange}
+        />
+      </Form.Group>
+
+      <Form.Group className="mt-3">
+        <Form.Label>Question Type</Form.Label>
+        <Form.Select
+          name="question_type"
+          value={formData.question_type || "multiple_choice"}
+          onChange={handleChange}
+        >
+          <option value="multiple_choice">Multiple Choice</option>
+          <option value="multi_select">Multi-Select</option>
+          <option value="true_false">True/False</option>
+        </Form.Select>
+      </Form.Group>
+
+      {/* Render options for editing */}
+      {formData.options && (
+        <Form.Group className="mt-3">
+          <Form.Label>Options</Form.Label>
+          {formData.options.map((option, index) => (
+            <div key={option.option_id} className="d-flex align-items-center mb-2">
+              <Form.Control
+                type="text"
+                value={option.option_text}
+                onChange={(e) => handleOptionChange(index, e.target.value)}
+              />
+              <Form.Check
+                type={formData.question_type === "multi_select" ? "checkbox" : "radio"}
+                className="ms-2"
+                checked={option.is_correct}
+                onChange={() => handleCorrectAnswerChange(index)}
+              />
+            </div>
+          ))}
+        </Form.Group>
+      )}
+    </>
+  )}
+</Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setEditingQuestion(null)}>Cancel</Button>
           <Button variant="primary" onClick={handleSave}>Save</Button>
