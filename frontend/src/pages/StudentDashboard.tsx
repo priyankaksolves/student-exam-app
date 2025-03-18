@@ -88,19 +88,31 @@ const StudentDashboard: React.FC = () => {
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
                 <td>{exam.status}</td>
                 <td>
-                  {exam.status === "not_started" && (
+                  {!user?.is_registered ? (
                     <Button
                       onClick={() =>
-                        handleStartExam(exam.student_exam_id)
+                        navigate(`/smowl/registration/${exam.student_exam_id}`)
                       }
                     >
-                      Start Exam
+                      Register for exam
                     </Button>
-                  )}
-                  {exam.status === "completed" && (
-                    <Button onClick={() => showResult(exam.student_exam_id)}>
-                      Show Result
-                    </Button>
+                  ) : (
+                    <>
+                      {exam.status === "not_started" && (
+                        <Button
+                          onClick={() => handleStartExam(exam.student_exam_id)}
+                        >
+                          Start Exam
+                        </Button>
+                      )}
+                      {exam.status === "completed" && (
+                        <Button
+                          onClick={() => showResult(exam.student_exam_id)}
+                        >
+                          Show Result
+                        </Button>
+                      )}
+                    </>
                   )}
                 </td>
               </tr>

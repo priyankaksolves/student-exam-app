@@ -5,9 +5,12 @@ import { declareResult, getStudentExamById, submitExam } from "../api";
 import { toast } from "react-toastify";
 import { Exam } from "../interfaces/exam";
 import { Option, Question } from "../interfaces/Question";
+import { useAuth } from "../authContext/AuthContext";
 
 const ExamPage: React.FC = () => {
   const { studentExamId } = useParams();
+  const { user } = useAuth();
+  
   const navigate = useNavigate();
 
   const [exam, setExam] = useState<Exam | null>(null);
@@ -15,6 +18,25 @@ const ExamPage: React.FC = () => {
   const [responses, setResponses] = useState<{
     [key: number]: number | number[] | boolean | null;
   }>({});
+  const [smowlUrl, setSmowlUrl] = useState("");
+
+  useEffect(() => {
+    const fetchSmowlUrl = async () => {
+      try {
+        if(!user){return}
+        else {
+        const response = await fetch(
+          `http://localhost:5000/api/smowl/monitor?userId=${user.user_id}&userName=${encodeURIComponent(user.first_name)}&userEmail=${encodeURIComponent(user.email)}&activityId=${studentExamId}&activityType=quiz&lang=en`
+        );
+        const data = await response.json();
+        if (data.url) setSmowlUrl(data.url);
+      } }catch (error) {
+        console.error("Error fetching SMOWL monitoring URL:", error);
+      }
+    };
+
+    fetchSmowlUrl();
+  }, [user, studentExamId]);
 
   useEffect(() => {
     const fetchExamDetails = async () => {
@@ -125,6 +147,20 @@ const ExamPage: React.FC = () => {
     <Container>
       <h2>{exam.title}</h2>
       <p>Duration: {exam.duration} minutes</p>
+      <div>
+      {smowlUrl ? (
+        <iframe
+          src={smowlUrl}
+          width="100%"
+          height="500px"
+          frameBorder="0"
+          allow="microphone; camera"
+          sandbox="allow-same-origin allow-scripts allow-popups"
+        />
+      ) : (
+        <p>Loading proctoring session...</p>
+      )}
+    </div>
 
       {exam.questions.map((question: Question, index: number) => (
         <div key={question.question_id} className="mb-4">

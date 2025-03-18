@@ -7,6 +7,7 @@ interface UserType {
   last_name: string;
   email: string;
   role: string;
+  is_registered: boolean;
 }
 
 interface AuthContextType {
