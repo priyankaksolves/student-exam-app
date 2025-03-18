@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Card, Modal, Form, Container, Alert, Row, Col } from "react-bootstrap";
 import { Question } from "../interfaces/exam";
-import { updateQuestion } from "../api";
+import { deleteQuestion, updateQuestion } from "../api";
 
 interface Option {
   option_id: number;
@@ -85,7 +85,7 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
   
         const response = await updateQuestion(formData.exam_id, formData.question_id, payload);
   
-        onEdit(formData.question_id, response.data.question);
+        onEdit(formData.question_id, formData);
         setEditingQuestion(null);
       } catch (error) {
         console.error("Error updating question:", error);
@@ -95,9 +95,13 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
   
   
 
-  const handleDelete = (questionId: number) => {
+  const handleDelete = async (questionId: number, exam_id: number) => {
     if (window.confirm("Are you sure you want to delete this question?")) {
-      onDelete(questionId);
+      try {
+        await deleteQuestion(questionId, exam_id); // API call to delete the question
+      } catch (error) {
+        console.error("Error deleting question:", error);
+      }
     }
   };
 
@@ -118,7 +122,7 @@ const ExistingQuestions: React.FC<ExistingQuestionsProps> = ({ questions, onEdit
               </Col>
               <Col md={4} className="text-end">
                 <Button variant="warning" className="me-2" onClick={() => handleEdit(question)}>Edit</Button>
-                <Button variant="danger" onClick={() => handleDelete(question.question_id)}>Delete</Button>
+                <Button variant="danger" onClick={() => handleDelete(question.question_id, question.exam_id)}>Delete</Button>
               </Col>
             </Row>
           </Card.Body>

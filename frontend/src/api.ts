@@ -139,9 +139,9 @@ export const updateQuestion = async (
   return api.put(`exam/${exam_id}/question/edit/${question_id}`, questionData);
 };
 
-export const deleteQuestion = async (id: number) => {
+export const deleteQuestion = async (question_id: number,exam_id: number) => {
   try {
-    const response = await axios.delete(`${API_URL}/questions/${id}`);
+    const response = await axios.delete(`${API_URL}/exam/${exam_id}/question/${question_id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting question:", error);
