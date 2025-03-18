@@ -4,14 +4,14 @@ import { Exam } from "../interfaces/exam";
 import ExamForm from "../components/ExamForm";
 
 const CreateExam: React.FC = () => {
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const [examData, setExamData] = useState<Partial<Exam>>({
     title: "",
     description: "",
     duration: undefined,
     type: "aptitude",
     pass_marks: undefined,
-    created_by: userId,
+    created_by: user?.user_id,
   });
 
   return (

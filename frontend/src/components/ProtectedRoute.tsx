@@ -8,11 +8,11 @@ interface ProtectedRouteProps {
 
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, accessRole }) => {
-  const { isLoggedIn, role  } = useAuth();
+  const { isLoggedIn, user  } = useAuth();
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }
-  if (accessRole && accessRole !== role) {
+  if (accessRole && accessRole !== user?.role ) {
     alert("Access Denied");
     return <Navigate to="/" />;
   }

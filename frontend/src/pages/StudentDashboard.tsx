@@ -15,7 +15,7 @@ interface StudentExam {
 }
 
 const StudentDashboard: React.FC = () => {
-  const { userId } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [exams, setExams] = useState<StudentExam[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,10 @@ const StudentDashboard: React.FC = () => {
 
   const fetchExams = async () => {
     try {
-      const response = await getStudentExams(userId);
+      if (!user?.user_id) {
+        throw new Error("User ID is undefined");
+      }
+      const response = await getStudentExams(user.user_id);
       setExams(response.exams);
     } catch (err: any) {
       setError("Failed to load exams. Please try again.");

@@ -3,11 +3,11 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../authContext/AuthContext";
 
 const RoleBasedRedirect: React.FC = () => {
-  const { role } = useAuth();
+  const { user } = useAuth();
 
-  if (role && role === "admin") {
+  if (user?.role === "admin") {
     return <Navigate to="/admin/dashboard" />;
-  } else if (role && role === "student") {
+  } else if (user?.role === "student") {
     return <Navigate to="/studentdashboard" />;
   } else {
     return <Navigate to="/login" />;

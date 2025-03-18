@@ -58,11 +58,6 @@ export const getUserProfile = async (token: string) => {
   }
 };
 
-// Logout User (Optional - Clearing token from localStorage)
-export const logoutUser = () => {
-  localStorage.removeItem("token");
-};
-
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exam/${id}`);
 export const getStudentExamById = async (id: number) => {

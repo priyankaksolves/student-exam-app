@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { Table, Spinner } from "react-bootstrap";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   fetchStudents,
   fetchExams,
@@ -47,7 +47,6 @@ const StudentExam: React.FC = () => {
   const [selectedExam, setSelectedExam] = useState<Option | null>(null);
   const [startTime, setStartTime] = useState("");
   const [studentExams, setStudentExams] = useState<StudentExamRecord[]>([]);
-  const { id } = useParams()
 
   useEffect(() => {
     loadStudents();

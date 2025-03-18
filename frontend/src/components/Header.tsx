@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext/AuthContext";
 
 const Header: React.FC = () => {
-  const { isLoggedIn, role, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,7 +15,7 @@ const Header: React.FC = () => {
     <header className="header" style={styles.navbar}>
       <nav>
         <ul style={styles.menu}>
-          {isLoggedIn && role === "admin" && (
+          {isLoggedIn && user?.role === "admin" && (
             <>
               <li style={styles.menuItem}>
                 <NavLink
@@ -44,7 +44,7 @@ const Header: React.FC = () => {
             </>
           )}
 
-          {isLoggedIn && role === "student" && (
+          {isLoggedIn && user?.role === "student" && (
             <li style={styles.menuItem}>
               <NavLink
                 to="/studentdashboard"

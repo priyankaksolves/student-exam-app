@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "../src/pages/Login";
 import Signup from "../src/pages/Signup";
 import Header from "../src/components/Header";
-import AptitudeTest from "../src/components/AptitudeTest";
 import CreateExam from "../src/pages/CreateExam";
 import EditExam from "../src/pages/EditExam";
 import StudentExam from "../src/pages/StudentExam";
@@ -25,7 +24,6 @@ const AppRoutes: React.FC = () => {
   const { isLoggedIn } = useAuth();
       
   useEffect(() => {
-    console.log(isLoggedIn);
     setLoading(false);
     
   },[isLoggedIn]);
@@ -47,9 +45,6 @@ const AppRoutes: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/admin/dashboard" element={<ProtectedRoute accessRole="admin"><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/aptitudeTest/:examId" element={<ProtectedRoute accessRole="admin"><AptitudeTest /></ProtectedRoute>} />
-          <Route path="/exam/:examId/questions" element={<ProtectedRoute accessRole="admin"><AptitudeTest /></ProtectedRoute>} />
-          {/* <Route path="/EditQuestions" element={<ProtectedRoute accessRole="admin"><EditQuestions/></ProtectedRoute>} /> */}
           <Route path="/create-exam" element={<ProtectedRoute accessRole="admin"><CreateExam /></ProtectedRoute>} />
           <Route path="/edit-exam/:id" element={<ProtectedRoute accessRole="admin"><EditExam /></ProtectedRoute>} />
           <Route path="/admin/student-exam" element={<ProtectedRoute accessRole="admin"><StudentExam /></ProtectedRoute>} />

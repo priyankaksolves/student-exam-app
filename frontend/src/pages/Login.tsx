@@ -1,44 +1,37 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../authContext/AuthContext';
-import { loginUser } from '../api'; // Import API function
-import { jwtDecode } from 'jwt-decode';
+import React, { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../authContext/AuthContext";
+import { loginUser } from "../api";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
 
+  useEffect(() => {
+    if (user) {
+      if (user.role === "student") {
+        navigate("/studentdashboard");
+      } else {
+        navigate("/admin/dashboard");
+      }
+    }
+  }, [user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-  
+    setError("");
+
     try {
       const response = await loginUser(email, password);
-      if (!response.token) throw new Error('Invalid login response');
-  
-      localStorage.setItem('token', response.token);
-  
-      // Decode JWT to extract user info
-      const decodedToken: any = jwtDecode(response.token);
-      login(decodedToken.user_id, decodedToken.role); // Pass user_id from decoded token
-  
-      if(decodedToken.role === 'student') {
-        navigate('/studentdashboard');
-      }
-      else {
-        navigate('/admin/dashboard');
-      }
-
+      if (!response.token) throw new Error("Invalid login response");
+      login(response.token);
     } catch (err: any) {
-      setError(err.message || 'Invalid credentials');
+      setError(err.message || "Invalid credentials");
     }
   };
-  
-  
 
   return (
     <div style={{ maxWidth: '500px', margin: '50px auto', padding: '30px', textAlign: 'center' }}>
