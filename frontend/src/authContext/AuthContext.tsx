@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   user: UserType | null;
+  updateUser: (updatedUser: Partial<UserType>) => void;
 }
 
 interface AuthProviderProps {
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const decodedToken: any = jwtDecode(token);
         setUser(decodedToken.user);
+        updateUser({ is_registered: localStorage.getItem("regestired") === "true" });
         setIsLoggedIn(true);
       } catch (error) {
         console.error("Invalid token");
@@ -47,6 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("token", token);
       const decodedToken: any = jwtDecode(token);
       setUser(decodedToken.user);
+      localStorage.setItem("regestired",decodedToken.user.is_registered);
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Error decoding token", error);
@@ -55,12 +58,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("regestired");
     setUser(null);
     setIsLoggedIn(false);
   };
 
+  const updateUser = (updatedUser: Partial<UserType>) => {
+    setUser((prevUser) => (prevUser ? { ...prevUser, ...updatedUser } : null));
+    localStorage.setItem("regestired", String(updatedUser.is_registered));
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout, user }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, user, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

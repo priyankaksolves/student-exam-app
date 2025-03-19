@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../authContext/AuthContext";
 import { useParams } from "react-router-dom";
+import { getRegistrationUrl } from "../api";
 
 const SmowlRegistration = () => {
   const { user } = useAuth();
@@ -10,16 +11,9 @@ const SmowlRegistration = () => {
   useEffect(() => {
     const fetchRegisterUrl = async () => {
       try {
-        if (user) {
-          const response = await fetch(
-            `http://localhost:5000/api/smowl/register?userId=${user.user_id}&userName=${encodeURIComponent(
-              user.first_name
-            )}&userEmail=${encodeURIComponent(user.email)}&activityId=${id}&activityType=quiz&lang=en&activityUrl=${encodeURIComponent(
-              "http://localhost:5173"
-            )}`
-          );
-          const data = await response.json();
-          if (data.url) setRegisterUrl(data.url);
+        if (user && id && !user.is_registered) {
+          const response = await getRegistrationUrl(user.user_id, user.first_name, user.email,id )
+          if (response.data.url) setRegisterUrl(response.data.url);
         }
       } catch (error) {
         console.error("Error fetching SMOWL registration URL:", error);

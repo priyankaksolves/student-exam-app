@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Button, Spinner, Form } from "react-bootstrap";
-import { declareResult, getStudentExamById, submitExam } from "../api";
+import { declareResult, getStudentExamById, getMonitoringUrl, submitExam } from "../api";
 import { toast } from "react-toastify";
 import { Exam } from "../interfaces/exam";
 import { Option, Question } from "../interfaces/Question";
@@ -21,21 +21,17 @@ const ExamPage: React.FC = () => {
   const [smowlUrl, setSmowlUrl] = useState("");
 
   useEffect(() => {
-    const fetchSmowlUrl = async () => {
+    const fetchMonitoringUrl = async () => {
       try {
-        if(!user){return}
-        else {
-        const response = await fetch(
-          `http://localhost:5000/api/smowl/monitor?userId=${user.user_id}&userName=${encodeURIComponent(user.first_name)}&userEmail=${encodeURIComponent(user.email)}&activityId=${studentExamId}&activityType=quiz&lang=en`
-        );
-        const data = await response.json();
-        if (data.url) setSmowlUrl(data.url);
-      } }catch (error) {
-        console.error("Error fetching SMOWL monitoring URL:", error);
+        if(!user)return;
+        const response = await getMonitoringUrl(user.user_id, user.first_name, user.email, studentExamId,)
+        if (response.data.url) setSmowlUrl(response.data.url);
+      } catch (error) {
+        toast.error("Failed to load proctoring session.");
       }
     };
 
-    fetchSmowlUrl();
+    fetchMonitoringUrl();
   }, [user, studentExamId]);
 
   useEffect(() => {
@@ -143,25 +139,11 @@ const ExamPage: React.FC = () => {
   if (loading) return <Spinner animation="border" />;
   if (!exam) return <p>No exam found!</p>;
 
-  return (
+  return smowlUrl ? (
+    <div className="d-flex mt-3">
     <Container>
       <h2>{exam.title}</h2>
       <p>Duration: {exam.duration} minutes</p>
-      <div>
-      {smowlUrl ? (
-        <iframe
-          src={smowlUrl}
-          width="100%"
-          height="500px"
-          frameBorder="0"
-          allow="microphone; camera"
-          sandbox="allow-same-origin allow-scripts allow-popups"
-        />
-      ) : (
-        <p>Loading proctoring session...</p>
-      )}
-    </div>
-
       {exam.questions.map((question: Question, index: number) => (
         <div key={question.question_id} className="mb-4">
           <h4>
@@ -233,6 +215,20 @@ const ExamPage: React.FC = () => {
         Submit Exam
       </Button>
     </Container>
+  
+    <div>
+        <iframe
+          src={smowlUrl}
+          width="100%"
+          height="400px"
+          frameBorder="0"
+          allow="microphone; camera"
+          sandbox="allow-same-origin allow-scripts allow-popups"
+        />
+      </div>
+    </div>
+  ) : (
+    <p>Loading proctoring session...</p>
   );
 };
 

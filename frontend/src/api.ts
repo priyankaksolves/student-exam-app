@@ -297,4 +297,28 @@ export const updateStudentExam = async (studentExamData: {
 };
 
 
+// SWOML API
+export const updateRegistration = async (userId: number) => {
+  return await axios.patch(`${API_URL}/users/register/${userId}`)
+}
+
+export const getRegistrationUrl = async (userId: number, name: string, email: string, studentExamId: string ) => {
+  return await axios.get(
+    `${API_URL}/smowl/register?userId=${userId}&userName=${encodeURIComponent(
+      name
+    )}&userEmail=${encodeURIComponent(
+      email
+    )}&activityId=${studentExamId}&activityType=quiz&lang=en&activityUrl=${encodeURIComponent(
+      "http://localhost:5173/smowl/registration/status"
+    )}`
+  );
+};
+
+export const getMonitoringUrl = async (userId: number, name: string, email: string, studentExamId: string | undefined ) => {
+  return await axios.get(
+    `${API_URL}/smowl/monitor?userId=${userId}&userName=${encodeURIComponent(name)}&userEmail=${encodeURIComponent(email)}&activityId=${studentExamId}&activityType=quiz&lang=en`
+
+  );
+};
+
 export default api;

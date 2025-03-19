@@ -19,6 +19,7 @@ import AddQuestions from "../src/pages/AddQuestions";
 import EditStudentExam from "../src/pages/EditStudentExam";
 import ExamDetails from "../src/pages/ExamDetails";
 import SmowlRegistration from "../src/pages/SmowlRegistration";
+import RegistrationStatus from "../src/pages/RegistrationStatus";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -56,6 +57,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/edit/:studentExamId" element={<ProtectedRoute accessRole="admin"><EditStudentExam /></ProtectedRoute>} />
           <Route path="/exam/:id" element={<ProtectedRoute accessRole="admin"><ExamDetails /></ProtectedRoute>} /> 
           <Route path="/smowl/registration/:id" element={<ProtectedRoute accessRole="student"><SmowlRegistration /></ProtectedRoute>} />
+          <Route path="/smowl/registration/status" element={<ProtectedRoute accessRole="student"><RegistrationStatus /></ProtectedRoute>} />
 
         </Routes>
       </div>
