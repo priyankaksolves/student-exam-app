@@ -1,4 +1,3 @@
-// App.tsx
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "../src/pages/Login";
@@ -20,6 +19,7 @@ import EditStudentExam from "../src/pages/EditStudentExam";
 import ExamDetails from "../src/pages/ExamDetails";
 import SmowlRegistration from "../src/pages/SmowlRegistration";
 import RegistrationStatus from "../src/pages/RegistrationStatus";
+import Coding from "../src/pages/Coding";
 
 const AppRoutes: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Router>
       <Header />
-      <div className="container">
+      <div>
         <Routes>
           <Route path="/" element={<RoleBasedRedirect />} />
           <Route path="/login" element={<Login />} />
@@ -58,6 +58,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/exam/:id" element={<ProtectedRoute accessRole="admin"><ExamDetails /></ProtectedRoute>} /> 
           <Route path="/smowl/registration/:id" element={<ProtectedRoute accessRole="student"><SmowlRegistration /></ProtectedRoute>} />
           <Route path="/smowl/registration/status" element={<ProtectedRoute accessRole="student"><RegistrationStatus /></ProtectedRoute>} />
+          <Route path="/Coding/:studentExamId" element={<ProtectedRoute accessRole="student"><Coding /></ProtectedRoute>} /> 
 
         </Routes>
       </div>

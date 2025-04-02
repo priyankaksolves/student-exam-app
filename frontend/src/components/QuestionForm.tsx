@@ -7,11 +7,13 @@ import { useEffect, useRef, useState } from "react";
 interface QuestionFormProps {
   examID: number;
   onQuestionsChange?: (questions: Question[]) => void;
+  examType: "aptitude" | "coding";
 }
 
 const QuestionForm: React.FC<QuestionFormProps> = ({
   examID,
   onQuestionsChange,
+  examType,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
         { option_id: 0, question_id: 0, option_text: "", is_correct: false },
         { option_id: 0, question_id: 0, option_text: "", is_correct: false },
       ],
+      test_cases: [],
       correct_answer: undefined,
     },
   ]);
@@ -37,31 +40,47 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
   }, [questions, onQuestionsChange]);
 
   const handleChange = (index: number, field: keyof Question, value: any) => {
-    setQuestions((prev) =>
-      prev.map((q, i) =>
-        i === index
-          ? {
-              ...q,
-              [field]: value,
-              options:
-                field === "question_type"
-                  ? value === "true_false"
-                    ? []
-                    : [
-                      { option_id: 0, question_id: 0, option_text: "", is_correct: false },
-                      { option_id: 0, question_id: 0, option_text: "", is_correct: false },
-                      ]
-                  : q.options,
-              correct_answer:
-                field === "question_type" && value === "true_false"
-                  ? false
-                  : field === "correct_answer"
-                  ? value
-                  : q.correct_answer,
-            }
-          : q
-      )
-    );
+    setQuestions((prev) => {
+      return prev.map((q, i) => {
+        if (i === index) {
+          const updatedQuestion: Question = {
+            ...q,
+            [field]: value,
+            options:
+              field === "question_type"
+                ? value === "true_false"
+                  ? []
+                  : [
+                      {
+                        option_id: 0,
+                        question_id: 0,
+                        option_text: "",
+                        is_correct: false,
+                      },
+                      {
+                        option_id: 0,
+                        question_id: 0,
+                        option_text: "",
+                        is_correct: false,
+                      },
+                    ]
+                : q.options,
+            test_cases:
+              field === "question_type" && value === "coding"
+                ? [{ id:0, question_id: 0, input: "", expected_output: "" }]
+                : q.test_cases,
+            correct_answer:
+              field === "question_type" && value === "true_false"
+                ? false
+                : field === "correct_answer"
+                ? value
+                : q.correct_answer,
+          };
+          return updatedQuestion;
+        }
+        return q;
+      });
+    });
   };
 
   const handleOptionChange = (
@@ -75,6 +94,38 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
         updatedQuestions[qIndex].options = [];
       }
       updatedQuestions[qIndex].options[optIndex].option_text = value;
+      return updatedQuestions;
+    });
+  };
+
+  const handleTestCaseChange = (
+    qIndex: number,
+    testCaseIndex: number,
+    field: "input" | "expected_output",
+    value: string
+  ) => {
+    setQuestions((prev) => {
+      const updatedQuestions = [...prev];
+      if (!updatedQuestions[qIndex].test_cases) {
+        updatedQuestions[qIndex].test_cases = [];
+      }
+      updatedQuestions[qIndex].test_cases[testCaseIndex][field] = value;
+      return updatedQuestions;
+    });
+  };
+
+  const addTestCase = (qIndex: number) => {
+    setQuestions((prev) => {
+      const updatedQuestions = [...prev];
+      if (!updatedQuestions[qIndex].test_cases) {
+        updatedQuestions[qIndex].test_cases = [];
+      }
+      updatedQuestions[qIndex].test_cases.push({
+        id:0,
+        question_id: 0,
+        input: "",
+        expected_output: "",
+      });
       return updatedQuestions;
     });
   };
@@ -132,6 +183,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
           { option_id: 0, question_id: 0, option_text: "", is_correct: false },
           { option_id: 0, question_id: 0, option_text: "", is_correct: false },
         ],
+        test_cases: [],
         correct_answer: undefined,
       },
     ]);
@@ -204,7 +256,12 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
                 <label>Question Type</label>
                 <select
                   className="form-select"
-                  value={question.question_type}
+                  value={
+                    examType === "coding"
+                      ? (question.question_type = "coding")
+                      : question.question_type
+                  }
+                  disabled={examType === "coding"}
                   onChange={(e) =>
                     handleChange(qIndex, "question_type", e.target.value)
                   }
@@ -213,6 +270,9 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
                   <option value="multiple_choice">Multiple Choice</option>
                   <option value="multi_select">Multi Select</option>
                   <option value="true_false">True/False</option>
+                  {examType === "coding" && (
+                    <option value="coding">Coding</option>
+                  )}
                 </select>
               </div>
               <div className="col-6">
@@ -229,6 +289,57 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
                 />
               </div>
             </div>
+
+            {question.question_type === "coding" && (
+              <div className="mb-3">
+                <h6>Test Cases</h6>
+                {question.test_cases?.map((testCase, tcIndex) => (
+                  <div key={tcIndex} className="row mb-2">
+                    <div className="col">
+                      <label>Sample Input</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={testCase.input}
+                        onChange={(e) =>
+                          handleTestCaseChange(
+                            qIndex,
+                            tcIndex,
+                            "input",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="col">
+                      <label>Sample Output</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={testCase.expected_output}
+                        onChange={(e) =>
+                          handleTestCaseChange(
+                            qIndex,
+                            tcIndex,
+                            "expected_output",
+                            e.target.value
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => addTestCase(qIndex)}
+                >
+                  + Add Test Case
+                </button>
+              </div>
+            )}
 
             {question.question_type === "true_false" && (
               <div className="mb-3">

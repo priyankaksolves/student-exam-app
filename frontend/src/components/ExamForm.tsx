@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createExam, updateExam } from "../api";
 import { useNavigate, useParams } from "react-router-dom";
 import { Exam } from "../interfaces/exam";
@@ -20,6 +20,20 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
   const [addQuestion, setAddQuestion] = useState<boolean>(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [examType, setExamType] = useState<"aptitude" | "coding">("aptitude");
+
+  useEffect(() => {
+    if (examType === "coding") {
+      setExamType("coding");
+    } else {
+      setExamType("aptitude");
+    }
+  }, [examType]);
+
+  const handleExamTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setExamType(e.target.value as "aptitude" | "coding");
+    setAddQuestion(false);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -101,7 +115,10 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
             name="type"
             className="form-select"
             value={examData.type ?? ""}
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e);
+              handleExamTypeChange(e);
+            }}
             required
           >
             <option value="aptitude">Aptitude</option>
@@ -145,7 +162,7 @@ const ExamForm: React.FC<CreateExamProps> = ({ examData, setExamData }) => {
         />
       </div>
       {addQuestion && (
-        <QuestionForm examID={0} onQuestionsChange={setQuestions} />
+        <QuestionForm examID={0} onQuestionsChange={setQuestions} examType={examType} />
       )}
       {!id && (
         <div className="d-flex">

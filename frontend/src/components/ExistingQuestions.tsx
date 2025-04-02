@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Card, Modal, Form, Container, Alert, Row, Col } from "react-bootstrap";
-import { Question } from "../interfaces/exam";
+import { Question } from "../interfaces/Question";
 import { deleteQuestion, updateQuestion } from "../api";
 
 interface Option {

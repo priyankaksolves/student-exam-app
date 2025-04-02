@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Select from "react-select";
-import { updateStudentExam, fetchStudents, fetchExams } from "../api"; // Import update API function
+import { updateStudentExam, fetchStudents, fetchExams } from "../api";
 import { User } from "../interfaces/User";
 import { Exam } from "../interfaces/exam";
 
@@ -77,7 +77,7 @@ const EditStudentExam: React.FC = () => {
   };
 
   return (
-    <div className="mt-5">
+    <div className="container mt-5">
       <h2>Edit Exam Assignment</h2>
       <div className="row">
         <div className="mb-2 col-4">

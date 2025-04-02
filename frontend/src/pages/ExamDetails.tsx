@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getExamById, getQuestionsForExam } from "../api";
-import { Exam, Question } from "../interfaces/exam";
+import { Exam } from "../interfaces/exam";
 import { Container, Card, Button, Spinner, Alert } from "react-bootstrap";
-import ExistingQuestions from "../components/ExistingQuestions"; // Import the component
+import ExistingQuestions from "../components/ExistingQuestions";
 import "../styles/ExamDetails.css";
+import { Question } from "../interfaces/Question";
 
 const ExamDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

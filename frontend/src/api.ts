@@ -321,4 +321,28 @@ export const getMonitoringUrl = async (userId: number, name: string, email: stri
   );
 };
 
+export const getCodingQuestion = async (questionId: number) => {
+  const token = localStorage.getItem("token");
+  return api.get(`/student-exam/question/${questionId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const fetchLanguages = async () => {
+  const { data } = await api.get("/judge0/languages");
+  return data;
+};
+
+export const submitCodeToJudge0 = async (payload: any) => {
+  const { data } = await api.post("/judge0/submit-code", payload);
+  return data;
+};
+
+export const fetchExecutionResult = async (token: string) => {
+  const { data } = await api.get(`/judge0/result/${token}`);
+  return data;
+};
+
 export default api;

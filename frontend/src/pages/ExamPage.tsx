@@ -4,8 +4,9 @@ import { Container, Button, Spinner, Form } from "react-bootstrap";
 import { declareResult, getStudentExamById, getMonitoringUrl, submitExam } from "../api";
 import { toast } from "react-toastify";
 import { Exam } from "../interfaces/exam";
-import { Option, Question } from "../interfaces/Question";
+import { Question } from "../interfaces/Question";
 import { useAuth } from "../authContext/AuthContext";
+import { Option } from "../interfaces/Option";
 
 const ExamPage: React.FC = () => {
   const { studentExamId } = useParams();

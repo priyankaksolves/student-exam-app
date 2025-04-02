@@ -9,39 +9,23 @@ import {
   fetchStudentExams,
   assignStudentExam,
   deleteStudentExam,
-} from "../api"; // Ensure these API functions are properly defined in your API file.
+} from "../api";
 import "../styles/AdminDashboard.css";
-
-interface Student {
-  user_id: number;
-  first_name: string;
-  email: string;
-}
-
-interface Exam {
-  exam_id: number;
-  title: string;
-}
+import { StudentExamRecord } from "../interfaces/StudentExam";
+import { Exam } from "../interfaces/exam";
+import { User } from "../interfaces/User";
 
 interface Option {
   value: number;
   label: string;
 }
 
-interface StudentExamRecord {
-  student_exam_id: number;
-  student: Student;
-  exam: Exam;
-  start_time: string;
-  end_time: string;
-  status: string;
-}
 
 const StudentExam: React.FC = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState<Student[]>([]);
+  const [students, setStudents] = useState<User[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Option | null>(null);
   const [selectedExam, setSelectedExam] = useState<Option | null>(null);
@@ -152,7 +136,7 @@ const StudentExam: React.FC = () => {
   }));
 
   return (
-    <div className="mt-5">
+    <div className="container mt-5">
       <button className="btn btn-primary rounded-pill btn-sm" onClick={handleAssignExam}>
         Assign Exam
       </button>
@@ -203,7 +187,7 @@ const StudentExam: React.FC = () => {
         </div>
       )}
 
-      {studentExams.length > 0 && (
+      {studentExams.length > 0 ? (
         <Table striped bordered hover responsive className="mt-3">
           <thead>
             <tr>
@@ -237,7 +221,7 @@ const StudentExam: React.FC = () => {
             ))}
           </tbody>
         </Table>
-      )}
+      ):( <div className="m-5 text-center text-danger fs-2">No Record Found.</div>)}
     </div>
   );
 };

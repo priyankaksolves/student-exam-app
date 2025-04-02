@@ -1,6 +1,5 @@
 import { Question } from "./Question";
 
-// Create an exam
 export interface Exam {
   exam_id: number;
   title: string;
@@ -12,5 +11,3 @@ export interface Exam {
   is_live: boolean;
   questions: Question[];
 }
-
-export { Question };
