@@ -1,23 +1,32 @@
-import { Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext/AuthContext";
+import { toast } from "react-toastify";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  accessRole?: string;
+  allowedRoles: string[];
 }
 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
+  const { isLoggedIn, user, loading } = useAuth();
+  const navigate = useNavigate();
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, accessRole }) => {
-  const { isLoggedIn, user  } = useAuth();
+  if (loading) return null;
+
   if (!isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
-  if (accessRole && accessRole !== user?.role ) {
-    alert("Access Denied");
-    return <Navigate to="/" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return children;
+  if (!allowedRoles.includes(user?.role ?? "")) {
+    useEffect(() => {
+      toast.warning("Access Denied");
+      navigate("/", { replace: true });
+    }, []);
+    
+    return null;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
