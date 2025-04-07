@@ -1,4 +1,4 @@
-import { TestCase } from "./Testcase";
+import { TestCase } from "./TestCase";
 import { Option } from "./Option";
 
 export interface Question {

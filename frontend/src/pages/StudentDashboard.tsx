@@ -34,16 +34,7 @@ const StudentDashboard: React.FC = () => {
   const handleStartExam = async (studentExamId: number) => {
     try {
       await startExam(studentExamId);
-      navigate(`/student-exam/${studentExamId}`);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
-
-  const startCodingExam = async (studentExamId: number) => {
-    try {
-      await startExam(studentExamId);
-      navigate(`/coding/${studentExamId}`);
+      navigate("/student-exam", { state: { studentExamId } });
     } catch (error: any) {
       toast.error(error?.message || "Something went wrong");
     }
@@ -89,55 +80,16 @@ const StudentDashboard: React.FC = () => {
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
                 <td>{exam.status}</td>
                 <td>
-                  {typeof exam.exam?.type === "string" &&
-                  exam.exam.type === "coding" ? (
-                    <>
-                      {exam.status !== "completed" ? (
-                        <Button
-                          onClick={() => startCodingExam(exam.student_exam_id)}
-                        >
-                          Start Exam
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => showResult(exam.student_exam_id)}
-                        >
-                          Show Result
-                        </Button>
-                      )}
-                    </>
+                  {exam.status !== "completed" ? (
+                    <Button
+                      onClick={() => handleStartExam(exam.student_exam_id)}
+                    >
+                      Start Exam
+                    </Button>
                   ) : (
-                    <>
-                      {!user?.is_registered ? (
-                        <Button
-                          onClick={() =>
-                            navigate(
-                              `/smowl/registration/${exam.student_exam_id}`
-                            )
-                          }
-                        >
-                          Register for exam
-                        </Button>
-                      ) : (
-                        <>
-                          {exam.status !== "completed" ? (
-                            <Button
-                              onClick={() =>
-                                handleStartExam(exam.student_exam_id)
-                              }
-                            >
-                              Start Exam
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => showResult(exam.student_exam_id)}
-                            >
-                              Show Result
-                            </Button>
-                          )}
-                        </>
-                      )}
-                    </>
+                    <Button onClick={() => showResult(exam.student_exam_id)}>
+                      Show Result
+                    </Button>
                   )}
                 </td>
               </tr>

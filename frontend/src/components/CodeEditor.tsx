@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import ControlledEditor, { OnChange } from "@monaco-editor/react";
-import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchExecutionResult, submitCodeToJudge0 } from "../api";
 
@@ -10,10 +9,10 @@ interface CodeEditorProps {
   selectedLanguage: string;
   setSelectedLanguage: (languageId: string) => void;
   languages: { id: string; name: string }[];
+  studentExamId: number;
 }
 
-const CodeEditor:React.FC<CodeEditorProps> = ({ questionId, selectedLanguage, setSelectedLanguage, languages }) => {
-  const { studentExamId } = useParams();
+const CodeEditor:React.FC<CodeEditorProps> = ({ questionId, selectedLanguage, setSelectedLanguage, languages, studentExamId }) => {
 
   const [code, setCode] = useState("");
   const [input, setInput] = useState("");

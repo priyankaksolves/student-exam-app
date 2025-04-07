@@ -8,7 +8,6 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   user: User | null;
-  updateUser: (updatedUser: Partial<User>) => void;
 }
 
 interface AuthProviderProps {
@@ -47,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem("token", token);
       const decodedToken: any = jwtDecode(token);
       setUser(decodedToken.user);
-      localStorage.setItem("registered", String(decodedToken.user.is_registered));
       setIsLoggedIn(true);
     } catch (error) {
       console.error("Error decoding token", error);
@@ -56,18 +54,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("registered");
     setUser(null);
     setIsLoggedIn(false);
   };
 
-  const updateUser = (updatedUser: Partial<User>) => {
-    setUser((prevUser) => (prevUser ? { ...prevUser, ...updatedUser } : null));
-    localStorage.setItem("registered", String(updatedUser.is_registered ?? ""));
-  };
-
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, updateUser, loading }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
