@@ -18,6 +18,8 @@ const ExamPage = React.lazy(() => import("../src/pages/ExamPage"));
 const ResultPage = React.lazy(() => import("../src/pages/ResultPage"));
 const EditStudentExam = React.lazy(() => import("../src/pages/EditStudentExam"));
 const ExamDetails = React.lazy(() => import("../src/pages/ExamDetails"));
+const SmowlRegistration = React.lazy(() => import("../src/pages/SmowlRegistration"));
+const RegistrationStatus = React.lazy(() => import("../src/pages/RegistrationStatus"));
 
 const AppRoutes: React.FC = () => {
   const { isLoggedIn, user, loading } = useAuth();
@@ -53,6 +55,8 @@ const AppRoutes: React.FC = () => {
             <Route path="/studentdashboard" element={<StudentDashboard />} />
             <Route path="/student-exam" element={<ExamPage />} />
             <Route path="/result/:studentExamId" element={<ResultPage />} />
+            <Route path="/smowl/registration/:id" element={<SmowlRegistration />} />
+            <Route path="/smowl/registration/status" element={<RegistrationStatus />} />
           </Route>
         </Routes>
         </Suspense>

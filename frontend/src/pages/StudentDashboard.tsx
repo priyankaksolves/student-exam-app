@@ -80,16 +80,55 @@ const StudentDashboard: React.FC = () => {
                 <td>{new Date(exam.end_time).toLocaleString()}</td>
                 <td>{exam.status}</td>
                 <td>
-                  {exam.status !== "completed" ? (
-                    <Button
-                      onClick={() => handleStartExam(exam.student_exam_id)}
-                    >
-                      Start Exam
-                    </Button>
+                  {typeof exam.exam?.type === "string" &&
+                  exam.exam.type === "coding" ? (
+                    <>
+                      {exam.status !== "completed" ? (
+                        <Button
+                          onClick={() => handleStartExam(exam.student_exam_id)}
+                        >
+                          Start Exam
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => showResult(exam.student_exam_id)}
+                        >
+                          Show Result
+                        </Button>
+                      )}
+                    </>
                   ) : (
-                    <Button onClick={() => showResult(exam.student_exam_id)}>
-                      Show Result
-                    </Button>
+                    <>
+                      {!user?.is_registered ? (
+                        <Button
+                          onClick={() =>
+                            navigate(
+                              `/smowl/registration/${exam.student_exam_id}`
+                            )
+                          }
+                        >
+                          Register for exam
+                        </Button>
+                      ) : (
+                        <>
+                          {exam.status !== "completed" ? (
+                            <Button
+                              onClick={() =>
+                                handleStartExam(exam.student_exam_id)
+                              }
+                            >
+                              Start Exam
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => showResult(exam.student_exam_id)}
+                            >
+                              Show Result
+                            </Button>
+                          )}
+                        </>
+                      )}
+                    </>
                   )}
                 </td>
               </tr>
