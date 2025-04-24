@@ -3,7 +3,7 @@ import { Question } from "./interfaces/Question";
 import { Exam } from "./interfaces/exam";
 import { User } from "./interfaces/User";
 
-const API_URL = "http://localhost:5000/api"; // Base API URL
+const API_URL = "http://localhost:5000/api";
 
 // Set up Axios instance
 const api = axios.create({
@@ -46,18 +46,6 @@ export const registerUser = async (userData: {
   }
 };
 
-// Get User Profile (Protected Route)
-export const getUserProfile = async (token: string) => {
-  try {
-    const response = await api.get("/users/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data || "Failed to fetch profile";
-  }
-};
-
 // Exam APIs
 export const getExamById = async (id: number) => api.get(`/exam/${id}`);
 export const getStudentExamById = async (id: number) => {
@@ -81,49 +69,6 @@ export const createExam = async (examData: Partial<Exam>) => {
 
 export const updateExam = async (id: number | undefined, updatedExam: Partial<Exam>) => axios.put(`${API_URL}/exam/${id}`, updatedExam);
 export const deleteExam = async (id: number) => axios.delete(`${API_URL}/exam/${id}`);
-
-// **Aptitude Test APIs**
-
-// Get all questions (without specifying an exam)
-export const getAllQuestions = async () => {
-  return api.get(`/questions/allquestions`);
-};
-
-// Get all questions for an exam
-export const getExamQuestions = async (examId: number) => {
-  return api.get(`/exams/${examId}/questions`);
-};
-
-// Submit answers for an exam
-export const submitExamAnswers = async (
-  userId: number,
-  examId: number,
-  answers: { questionId: number; selectedOption: string }[]
-) => {
-  return api.post(`/exams/${examId}/submit`, { userId, answers });
-};
-
-// Get exam score after submission
-export const getExamScore = async (examId: number, userId: number) => {
-  return api.get(`/exams/${examId}/score/${userId}`);
-};
-
-// Get questions by exam id
-export const getQuestionsByExamId = async (examId: number) => {
-  return await axios.get(`${API_URL}/exams/${examId}/questions`);
-};
-
-// **NEW: Add a question to an exam**
-export const addQuestionToExam = async (
-  examId: number,
-  questionData: {
-    question_text: string;
-    options: string[];
-    correct_answer: string;
-  }
-) => {
-  return api.post(`/exams/${examId}/questions`, questionData);
-};
 
 // **NEW: Update an existing question**
 export const updateQuestion = async (
@@ -166,34 +111,6 @@ export const startExam = async (examId: number) => {
     });
 };
 
-// Fetch all students
-export const getAllStudents = async () => {
-  try {
-    const response = await axios.post(`${API_URL}/users/getUsers`, {
-      role: "student",
-    });
-    return response.data;
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || "Failed to load students."
-    );
-  }
-};
-
-// Assign an exam to a student
-export const assignExamToStudent = async (examData: {
-  student_id: number;
-  exam_id: number;
-  start_time: string;
-}) => {
-  try {
-    const response = await axios.post(`${API_URL}/student-exam`, examData);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to assign exam.");
-  }
-};
-
 // Fetch assigned exams for a student
 export const getStudentExams = async (studentId: number) => {
   try {
@@ -201,18 +118,6 @@ export const getStudentExams = async (studentId: number) => {
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch exams.");
-  }
-};
-
-// Start an exam
-export const startStudentExam = async (studentExamId: number) => {
-  try {
-    const response = await axios.patch(
-      `${API_URL}/student-exam/${studentExamId}/start`
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || "Failed to start exam.");
   }
 };
 
